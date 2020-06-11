@@ -3,73 +3,31 @@ package com.github.cbuschka.zipdiff;
 import org.junit.rules.ExternalResource;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public class TestZipFile extends ExternalResource
 {
-	private File zipFile;
-	private int entryCount = 1;
+	private String resourcePath;
 
-	public static TestZipFile newZipFile()
+	private File file;
+
+	public TestZipFile(String resourcePath)
 	{
-		return new TestZipFile();
+		this.resourcePath = resourcePath;
 	}
 
-	public TestZipFile withEntryCount(int entryCount)
+	public File getFile()
 	{
-		this.entryCount = entryCount;
-		return this;
-	}
-
-	public String getPath()
-	{
-		checkCreated();
-
-		return zipFile.getPath();
-	}
-
-	private void checkNotCreated()
-	{
-		if (this.zipFile != null)
-		{
-			throw new IllegalStateException("Already created.");
-		}
-	}
-
-	private void checkCreated()
-	{
-		if (this.zipFile == null)
-		{
-			throw new IllegalStateException("Not created, yet.");
-		}
+		return this.file;
 	}
 
 	@Override
-	protected void before() throws IOException
+	protected void before() throws URISyntaxException
 	{
-		checkNotCreated();
-
-		this.zipFile = File.createTempFile("junittest", ".zip");
-		try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(this.zipFile), Charset.defaultCharset());)
-		{
-			for (int i = 0; i < this.entryCount; ++i)
-			{
-				zipOut.putNextEntry(new ZipEntry(String.valueOf("file" + i)));
-				zipOut.closeEntry();
-			}
-		}
-	}
-
-	@Override
-	protected void after()
-	{
-		if (this.zipFile != null)
-		{
-			this.zipFile.delete();
-		}
+		URL url = Thread.currentThread().getContextClassLoader().getResource(this.resourcePath);
+		URI uri = url.toURI();
+		this.file = new File(uri.getPath());
 	}
 }
