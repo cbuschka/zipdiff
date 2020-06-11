@@ -9,7 +9,12 @@ mvn clean install
 
 ## Usage
 ```
-java -jar target/zipdiff.jar src/test/resources/a.zip src/test/resources/b.zip
+curl -sL https://raw.githubusercontent.com/cbuschka/zipdiff/master/zipdiff.sh | bash -s src/test/resources/a.zip src/test/resources/b.zip
+```
+
+or locally
+```
+./zipdiff.sh src/test/resources/a.zip src/test/resources/b.zip
 ```
 
 ### Example output:
