@@ -75,7 +75,7 @@ public class ZipDifferTest
 	private void thenFileIsKept(String path)
 	{
 		ZipDiffEntry zipDiffEntry = this.zipDiff.getEntryByPath(path);
-		assertThat(zipDiffEntry.getType(), is(ZipDiffEntryType.KEPT));
+		assertThat(zipDiffEntry.getType(), is(ZipDiffEntryType.UNCHANGED));
 	}
 
 	private void thenFileIsRenamed(String path, String newPath)

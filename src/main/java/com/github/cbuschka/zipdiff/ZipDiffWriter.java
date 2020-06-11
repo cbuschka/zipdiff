@@ -26,7 +26,7 @@ public class ZipDiffWriter implements Closeable
 				case REMOVED:
 					this.write(entryType, entry.getZipIndexEntry().getPath());
 					break;
-				case KEPT:
+				case UNCHANGED:
 					this.write(entryType, entry.getZipIndexEntry().getPath());
 					break;
 				case RENAMED:

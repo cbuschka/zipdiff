@@ -2,7 +2,7 @@ package com.github.cbuschka.zipdiff;
 
 public enum ZipDiffEntryType
 {
-	KEPT,
+	UNCHANGED,
 	RENAMED,
 	ADDED,
 	REMOVED,

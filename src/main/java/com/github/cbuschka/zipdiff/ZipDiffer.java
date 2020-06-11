@@ -29,7 +29,7 @@ public class ZipDiffer
 				}
 				else
 				{
-					zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.KEPT, aEntry, bEntry));
+					zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.UNCHANGED, aEntry, bEntry));
 				}
 			}
 		}
