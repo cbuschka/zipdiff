@@ -2,14 +2,17 @@
 
 ### A command line tool to diff jar/zip files
 
-## Usage
+## Build
 ```
 mvn clean install
-
-java -jar target/zipdiff.jar <zipfile1> <zipfile2>
 ```
 
-Example output:
+## Usage
+```
+java -jar target/zipdiff.jar src/test/resources/a.zip src/test/resources/b.zip
+```
+
+### Example output:
 ```
 KEPT: META-INF/
 CHANGED: META-INF/MANIFEST.MF
