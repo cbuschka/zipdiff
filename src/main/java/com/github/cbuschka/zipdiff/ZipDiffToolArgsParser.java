@@ -18,16 +18,26 @@ public class ZipDiffToolArgsParser
 	public ZipDiffToolArgs parse(String... args) throws ParseException
 	{
 		Options options = new Options();
-		options.addOption(Option.builder("q").longOpt("quiet").build());
+		options.addOption(Option.builder("q").longOpt("quiet").desc("Suppress all output.").build());
+		options.addOption(Option.builder("h").longOpt("help").desc("Print usage information.").build());
+
 		CommandLine commandLine = this.commandLineParser.parse(options, args);
 		List<String> argList = commandLine.getArgList();
-		if (argList.size() != 2)
+		boolean usageRequested = argList.size() != 2
+				|| commandLine.hasOption("h")
+				|| (argList.size() == 1 && argList.get(0).equals("help"));
+		boolean quiet = commandLine.hasOption("q");
+
+		File fileA = null;
+		File fileB = null;
+		if (!usageRequested)
 		{
-			throw new ParseException("Expected two files to diff.");
+			fileA = new File(argList.get(0));
+			fileB = new File(argList.get(1));
 		}
 
-		return new ZipDiffToolArgs(new File(argList.get(0)),
-				new File(argList.get(1)), EnumSet.allOf(ZipDiffEntryType.class),
-				commandLine.hasOption("q"));
+		return new ZipDiffToolArgs(options, fileA,
+				fileB, EnumSet.allOf(ZipDiffEntryType.class),
+				quiet, usageRequested);
 	}
 }

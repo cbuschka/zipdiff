@@ -1,5 +1,6 @@
 package com.github.cbuschka.zipdiff;
 
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
 
 import java.io.File;
@@ -8,17 +9,40 @@ import java.util.function.Function;
 
 public class ZipDiffTool
 {
-	private Function<File, ZipIndexReader> zipIndexReaderOpener = ZipIndexReader::open;
 	private ZipDiffToolArgsParser argsParser = new ZipDiffToolArgsParser();
+	private Function<File, ZipIndexReader> zipIndexReaderOpener = ZipIndexReader::open;
 	private ZipDiffer zipDiffer = new ZipDiffer();
 
-	public int run(String... stringArgs) throws IOException, ParseException
+	public int run(String... args) throws IOException, ParseException
 	{
-		ZipDiffToolArgs args = argsParser.parse(stringArgs);
+		ZipDiffToolArgs toolArgs = argsParser.parse(args);
+		if (toolArgs.isUsageRequested())
+		{
 
-		ZipDiff diff = calcDiff(args.getFileA(), args.getFileB());
+			printUsage(toolArgs);
+			return 2;
+		}
+		else
+		{
+			return runDiff(toolArgs);
+		}
+	}
 
-		writeDiff(args, diff);
+	private void printUsage(ZipDiffToolArgs toolArgs)
+	{
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.setLeftPadding(2);
+		formatter.printHelp("zipdiff [options] <zipfile1> <zipfile2>",
+				"\nA command line tool to diff jar/zip files.\n\n",
+				toolArgs.getOptions(), "\nPlease report issues at https://github.com/cbuschka/zipdiff/issues.\n",
+				false);
+	}
+
+	private int runDiff(ZipDiffToolArgs toolArgs) throws IOException
+	{
+		ZipDiff diff = calcDiff(toolArgs.getFileA(), toolArgs.getFileB());
+
+		writeDiff(toolArgs, diff);
 
 		return diff.containsChanges() ? 1 : 0;
 	}

@@ -1,21 +1,39 @@
 package com.github.cbuschka.zipdiff;
 
+import org.apache.commons.cli.Options;
+
 import java.io.File;
 import java.util.Set;
 
 public class ZipDiffToolArgs
 {
+	private boolean usageRequested;
 	private boolean quiet;
+	private Options options;
 	private File fileA;
 	private File fileB;
 	private Set<ZipDiffEntryType> entryTypes;
 
-	public ZipDiffToolArgs(File fileA, File fileB, Set<ZipDiffEntryType> entryTypes, boolean quiet)
+	public ZipDiffToolArgs(Options options, File fileA, File fileB,
+						   Set<ZipDiffEntryType> entryTypes,
+						   boolean quiet, boolean usageRequested)
 	{
+		this.options = options;
 		this.fileA = fileA;
 		this.fileB = fileB;
 		this.entryTypes = entryTypes;
 		this.quiet = quiet;
+		this.usageRequested = usageRequested;
+	}
+
+	public Options getOptions()
+	{
+		return options;
+	}
+
+	public boolean isUsageRequested()
+	{
+		return usageRequested;
 	}
 
 	public boolean isQuiet()
