@@ -1,7 +1,11 @@
 package com.github.cbuschka.zipdiff;
 
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.math.BigInteger;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -10,12 +14,26 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class ZipIndexReader
+public class ZipIndexReader implements Closeable
 {
 	private ChecksumCalculator checksumCalculator = new ChecksumCalculator();
 	private final ZipInputStream zipIn;
 	private final String path;
 	private final MessageDigest zipMessageDigest;
+
+	public static ZipIndexReader open(File f)
+	{
+		try
+		{
+			String path = f.toURI().toURL().toExternalForm();
+			FileInputStream zipDataIn = new FileInputStream(f);
+			return new ZipIndexReader(path, zipDataIn);
+		}
+		catch (IOException ex)
+		{
+			throw new UndeclaredThrowableException(ex);
+		}
+	}
 
 	public ZipIndexReader(String path, InputStream zipDataIn)
 	{
