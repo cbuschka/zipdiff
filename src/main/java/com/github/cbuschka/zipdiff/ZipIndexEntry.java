@@ -8,13 +8,15 @@ public class ZipIndexEntry
 	private final String path;
 	private BigInteger checksum;
 	private final long size;
+	private final long compressedSize;
 	private final ZipIndex zipIndex;
 
-	public ZipIndexEntry(String entryPath, BigInteger checksum, long entrySize, long entryCrc, ZipIndex zipIndex)
+	public ZipIndexEntry(String entryPath, BigInteger checksum, long entrySize, long compressedSize, long entryCrc, ZipIndex zipIndex)
 	{
 		this.path = entryPath;
 		this.zipIndex = zipIndex;
 		this.crc = entryCrc;
+		this.compressedSize = compressedSize;
 		this.size = entrySize;
 		this.checksum = checksum;
 	}
@@ -42,5 +44,10 @@ public class ZipIndexEntry
 	public long getCrc()
 	{
 		return crc;
+	}
+
+	public long getCompressedSize()
+	{
+		return compressedSize;
 	}
 }

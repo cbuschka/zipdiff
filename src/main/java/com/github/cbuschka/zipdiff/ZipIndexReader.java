@@ -52,8 +52,7 @@ public class ZipIndexReader implements Closeable
 			entryMap.put(indexEntry.getPath(), indexEntry);
 		}
 
-		ZipIndex index = new ZipIndex(path, new BigInteger(this.zipMessageDigest.digest()), entryMap);
-		return index;
+		return new ZipIndex(path, new BigInteger(this.zipMessageDigest.digest()), entryMap);
 	}
 
 	private ZipIndexEntry readIndexEntryOrNull() throws IOException
@@ -65,6 +64,7 @@ public class ZipIndexReader implements Closeable
 		}
 
 		String entryPath = nextEntry.getName();
+		long entryCompressedSize = nextEntry.getCompressedSize();
 		long entryCrc = nextEntry.getCrc();
 		long entrySize = nextEntry.getSize();
 
@@ -79,8 +79,8 @@ public class ZipIndexReader implements Closeable
 		{
 			checksum = this.checksumCalculator.calcChecksum(zipIn);
 		}
-		ZipIndexEntry indexEntry = new ZipIndexEntry(entryPath, checksum, entrySize, entryCrc, subIndex);
-		return indexEntry;
+
+		return new ZipIndexEntry(entryPath, checksum, entrySize, entryCompressedSize, entryCrc, subIndex);
 	}
 
 	private ZipIndex readZipIndex(String entryPath) throws IOException
