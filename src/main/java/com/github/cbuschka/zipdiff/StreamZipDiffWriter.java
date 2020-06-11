@@ -44,13 +44,13 @@ public class StreamZipDiffWriter implements ZipDiffWriter
 
 	private void write(ZipDiffEntryType entryType, String path) throws IOException
 	{
-		String s = String.format("%s: %s\n", entryType.name(), path);
+		String s = String.format("%s: %s%n", entryType.name(), path);
 		this.wr.write(s);
 	}
 
 	private void write(ZipDiffEntryType entryType, String pathA, String pathB) throws IOException
 	{
-		String s = String.format("%s: %s %s\n", entryType.name(), pathA, pathB);
+		String s = String.format("%s: %s %s%n", entryType.name(), pathA, pathB);
 		this.wr.write(s);
 	}
 
