@@ -7,6 +7,11 @@ public class ZipDiff
 {
 	private List<ZipDiffEntry> entries = new ArrayList<>();
 
+	public Iterable<ZipDiffEntry> getEntries()
+	{
+		return this.entries;
+	}
+
 	public void addEntry(ZipDiffEntry entry)
 	{
 		this.entries.add(entry);
