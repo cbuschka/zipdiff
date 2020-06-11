@@ -1,6 +1,6 @@
-# [![Build](https://api.travis-ci.com/cbuschka/zipdiff.svg?branch=master)](https://travis-ci.com/github/cbuschka/zipdiff) [![License](https://img.shields.io/github/license/cbuschka/zipdiff.svg)](https://github.com/cbuschka/zipdiff/blob/master/license.txt) ZipDiff - a diff tool for zips and jars
+# ZipDiff [![Build](https://api.travis-ci.com/cbuschka/zipdiff.svg?branch=master)](https://travis-ci.com/github/cbuschka/zipdiff) [![License](https://img.shields.io/github/license/cbuschka/zipdiff.svg)](https://github.com/cbuschka/zipdiff/blob/master/license.txt)
 
-### A command line tool to diff jar/zip files.
+### A command line tool to diff jar/zip files
 
 ## Usage
 ```
