@@ -11,9 +11,34 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
+    <scm>
+        <developerConnection>scm:git:ssh://git@github.com/cbuschka/zipdiff</developerConnection>
+        <connection>scm:git:ssh://git@github.com/cbuschka/zipdiff</connection>
+        <tag>HEAD</tag>
+    </scm>
     <url>https://github.com/cbuschka/zipdiff</url>
+    <developers>
+        <developer>
+            <id>cbuschka</id>
+            <email>cbuschka@gmail.com</email>
+            <name>Cornelius Buschka</name>
+            <url>https://github.com/cbuschka</url>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/cbuschka/zipdiff/issues</url>
+    </issueManagement>
     <build>
-	<finalName>${project.artifactId}</finalName>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
