@@ -5,8 +5,8 @@ public enum ZipDiffEntryType
 	UNCHANGED,
 	RENAMED,
 	ADDED,
-	REMOVED,
-	CHANGED;
+	DELETED,
+	MODIFIED;
 
 	public boolean isChange()
 	{

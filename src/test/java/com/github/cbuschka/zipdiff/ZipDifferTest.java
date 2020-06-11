@@ -88,7 +88,7 @@ public class ZipDifferTest
 	private void thenFileIsRemoved(String path)
 	{
 		ZipDiffEntry zipDiffEntry = this.zipDiff.getEntryByPath(path);
-		assertThat(zipDiffEntry.getType(), is(ZipDiffEntryType.REMOVED));
+		assertThat(zipDiffEntry.getType(), is(ZipDiffEntryType.DELETED));
 	}
 
 	private void thenFileIsAdded(String path)
@@ -100,7 +100,7 @@ public class ZipDifferTest
 	private void thenFileIsChanged(String path)
 	{
 		ZipDiffEntry zipDiffEntry = this.zipDiff.getEntryByOtherPath(path);
-		assertThat(zipDiffEntry.getType(), is(ZipDiffEntryType.CHANGED));
+		assertThat(zipDiffEntry.getType(), is(ZipDiffEntryType.MODIFIED));
 	}
 
 	private void thenDiffEntryCountIs(int n)

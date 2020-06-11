@@ -24,7 +24,7 @@ public class StreamZipDiffWriter implements ZipDiffWriter
 				case ADDED:
 					this.write(entryType, entry.getZipIndexEntry().getPath());
 					break;
-				case REMOVED:
+				case DELETED:
 					this.write(entryType, entry.getZipIndexEntry().getPath());
 					break;
 				case UNCHANGED:
@@ -33,7 +33,7 @@ public class StreamZipDiffWriter implements ZipDiffWriter
 				case RENAMED:
 					this.write(entryType, entry.getZipIndexEntry().getPath(), entry.getOtherZipIndexEntry().getPath());
 					break;
-				case CHANGED:
+				case MODIFIED:
 					this.write(entryType, entry.getZipIndexEntry().getPath());
 					break;
 				default:

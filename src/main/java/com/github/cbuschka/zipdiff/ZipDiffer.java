@@ -25,7 +25,7 @@ public class ZipDiffer
 			{
 				if (aEntry.getCrc() != bEntry.getCrc())
 				{
-					zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.CHANGED, aEntry, bEntry));
+					zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.MODIFIED, aEntry, bEntry));
 				}
 				else
 				{
@@ -42,7 +42,7 @@ public class ZipDiffer
 				bEntry = b.getEntryByChecksum(aEntry.getChecksum());
 				if (bEntry == null)
 				{
-					zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.REMOVED, aEntry, bEntry));
+					zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.DELETED, aEntry, bEntry));
 				}
 			}
 		}
