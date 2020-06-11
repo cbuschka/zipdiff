@@ -1,27 +1,26 @@
 package com.github.cbuschka.zipdiff;
 
+import org.apache.commons.cli.ParseException;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.Charset;
 import java.util.function.Function;
 
 public class ZipDiffTool
 {
 	private Function<File, ZipIndexReader> zipIndexReaderOpener = ZipIndexReader::open;
-	private Function<Writer, ZipDiffWriter> zipDiffWriterNew = ZipDiffWriter::new;
-
+	private ZipDiffToolArgsParser argsParser = new ZipDiffToolArgsParser();
 	private ZipDiffer zipDiffer = new ZipDiffer();
 
-	public void run(String... args) throws IOException
+	public int run(String... stringArgs) throws IOException, ParseException
 	{
-		File a = new File(args[0]);
-		File b = new File(args[1]);
+		ZipDiffToolArgs args = argsParser.parse(stringArgs);
 
-		ZipDiff diff = calcDiff(a, b);
+		ZipDiff diff = calcDiff(args.getFileA(), args.getFileB());
 
-		writeDiff(diff);
+		writeDiff(args, diff);
+
+		return diff.containsChanges() ? 1 : 0;
 	}
 
 	private ZipDiff calcDiff(File a, File b) throws IOException
@@ -31,9 +30,9 @@ public class ZipDiffTool
 		return zipDiffer.diff(indexA, indexB);
 	}
 
-	private void writeDiff(ZipDiff diff) throws IOException
+	private void writeDiff(ZipDiffToolArgs args, ZipDiff diff) throws IOException
 	{
-		try (ZipDiffWriter diffWriter = this.zipDiffWriterNew.apply(new OutputStreamWriter(System.out, Charset.defaultCharset()));)
+		try (ZipDiffWriter diffWriter = args.isQuiet() ? new NullZipDiffWriter() : new StreamZipDiffWriter();)
 		{
 			diffWriter.write(diff);
 		}

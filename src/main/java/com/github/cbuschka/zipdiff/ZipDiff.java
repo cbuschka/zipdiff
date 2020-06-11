@@ -47,4 +47,18 @@ public class ZipDiff
 
 		return null;
 	}
+
+	public boolean containsChanges()
+	{
+
+		for (ZipDiffEntry entry : this.entries)
+		{
+			if (entry.getType().isChange())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

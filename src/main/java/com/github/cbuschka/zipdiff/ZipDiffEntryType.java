@@ -7,4 +7,9 @@ public enum ZipDiffEntryType
 	ADDED,
 	REMOVED,
 	CHANGED;
+
+	public boolean isChange()
+	{
+		return this != UNCHANGED;
+	}
 }

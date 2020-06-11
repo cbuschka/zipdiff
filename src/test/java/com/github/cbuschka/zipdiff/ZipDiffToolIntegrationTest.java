@@ -1,5 +1,6 @@
 package com.github.cbuschka.zipdiff;
 
+import org.apache.commons.cli.ParseException;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -15,7 +16,7 @@ public class ZipDiffToolIntegrationTest
 	private ZipDiffTool zipDiffTool = new ZipDiffTool();
 
 	@Test
-	public void testIt() throws IOException
+	public void testIt() throws IOException, ParseException
 	{
 		zipDiffTool.run(aZip.getFile().getPath(), bZip.getFile().getPath());
 	}
