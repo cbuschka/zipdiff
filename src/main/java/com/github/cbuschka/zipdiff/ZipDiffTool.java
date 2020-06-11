@@ -14,7 +14,7 @@ public class ZipDiffTool
 
 	private ZipDiffer zipDiffer = new ZipDiffer();
 
-	public void run(String[] args) throws IOException
+	public void run(String... args) throws IOException
 	{
 		File a = new File(args[0]);
 		File b = new File(args[1]);
@@ -37,8 +37,6 @@ public class ZipDiffTool
 		{
 			diffWriter.write(diff);
 		}
-
-		System.out.flush();
 	}
 
 	private ZipIndex readZipIndexFrom(File file) throws IOException
