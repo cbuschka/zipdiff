@@ -22,7 +22,7 @@ public class StreamZipDiffWriter implements ZipDiffWriter
 			switch (entryType)
 			{
 				case ADDED:
-					this.write(entryType, entry.getZipIndexEntry().getPath());
+					this.write(entryType, entry.getOtherZipIndexEntry().getPath());
 					break;
 				case DELETED:
 					this.write(entryType, entry.getZipIndexEntry().getPath());

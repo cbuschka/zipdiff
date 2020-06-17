@@ -46,6 +46,16 @@ public class ZipIndexEntry
 		return crc;
 	}
 
+	public boolean isFolder()
+	{
+		return this.path.endsWith("/");
+	}
+
+	public boolean isFile()
+	{
+		return !isFolder();
+	}
+
 	public long getCompressedSize()
 	{
 		return compressedSize;
