@@ -1,6 +1,7 @@
 package com.github.cbuschka.zipdiff;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 public class ZipIndexEntry
 {
@@ -33,7 +34,7 @@ public class ZipIndexEntry
 
 	public ZipIndex getZipIndex()
 	{
-		 return this.zipIndex;
+		return this.zipIndex;
 	}
 
 	public long getSize()
@@ -54,6 +55,21 @@ public class ZipIndexEntry
 	public boolean isFile()
 	{
 		return !isFolder();
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		ZipIndexEntry that = (ZipIndexEntry) o;
+		return path.equals(that.path);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(path);
 	}
 
 	public long getCompressedSize()
