@@ -17,7 +17,7 @@ public class ZipDifferTest
 	private ZipIndex zipIndexA;
 	private ZipIndex zipIndexB;
 
-	private ZipDiffer differ = new ZipDiffer();
+	private ZipDiffer differ = new ZipDiffer(true);
 	private ZipDiff zipDiff;
 
 	@Test

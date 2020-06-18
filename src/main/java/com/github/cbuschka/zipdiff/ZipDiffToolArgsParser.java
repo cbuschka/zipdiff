@@ -19,6 +19,7 @@ public class ZipDiffToolArgsParser
 	{
 		Options options = new Options();
 		options.addOption(Option.builder("q").longOpt("quiet").desc("Suppress all output.").build());
+		options.addOption(Option.builder("r").longOpt("recursive").desc("Recurse into nested zip files.").build());
 		options.addOption(Option.builder("h").longOpt("help").desc("Print usage information.").build());
 
 		CommandLine commandLine = this.commandLineParser.parse(options, args);
@@ -27,6 +28,7 @@ public class ZipDiffToolArgsParser
 				|| commandLine.hasOption("h")
 				|| (argList.size() == 1 && argList.get(0).equals("help"));
 		boolean quiet = commandLine.hasOption("q");
+		boolean recurse = commandLine.hasOption("r");
 
 		File fileA = null;
 		File fileB = null;
@@ -38,6 +40,6 @@ public class ZipDiffToolArgsParser
 
 		return new ZipDiffToolArgs(options, fileA,
 				fileB, EnumSet.allOf(ZipDiffEntryType.class),
-				quiet, usageRequested);
+				quiet, usageRequested, recurse);
 	}
 }

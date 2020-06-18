@@ -11,14 +11,13 @@ public class ZipDiffTool
 {
 	private ZipDiffToolArgsParser argsParser = new ZipDiffToolArgsParser();
 	private Function<File, ZipIndexReader> zipIndexReaderOpener = ZipIndexReader::open;
-	private ZipDiffer zipDiffer = new ZipDiffer();
+	private ZipDiffer zipDiffer = new ZipDiffer(true);
 
 	public int run(String... args) throws IOException, ParseException
 	{
 		ZipDiffToolArgs toolArgs = argsParser.parse(args);
 		if (toolArgs.isUsageRequested())
 		{
-
 			printUsage(toolArgs);
 			return 2;
 		}
@@ -40,6 +39,8 @@ public class ZipDiffTool
 
 	private int runDiff(ZipDiffToolArgs toolArgs) throws IOException
 	{
+		this.zipDiffer.setRecurse(toolArgs.isRecurse());
+
 		ZipDiff diff = calcDiff(toolArgs.getFileA(), toolArgs.getFileB());
 
 		writeDiff(toolArgs, diff);

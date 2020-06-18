@@ -7,6 +7,7 @@ import java.util.Set;
 
 public class ZipDiffToolArgs
 {
+	private final boolean recurse;
 	private boolean usageRequested;
 	private boolean quiet;
 	private Options options;
@@ -16,7 +17,8 @@ public class ZipDiffToolArgs
 
 	public ZipDiffToolArgs(Options options, File fileA, File fileB,
 						   Set<ZipDiffEntryType> entryTypes,
-						   boolean quiet, boolean usageRequested)
+						   boolean quiet, boolean usageRequested,
+						   boolean recurse)
 	{
 		this.options = options;
 		this.fileA = fileA;
@@ -24,6 +26,7 @@ public class ZipDiffToolArgs
 		this.entryTypes = entryTypes;
 		this.quiet = quiet;
 		this.usageRequested = usageRequested;
+		this.recurse = recurse;
 	}
 
 	public Options getOptions()
@@ -54,5 +57,10 @@ public class ZipDiffToolArgs
 	public Set<ZipDiffEntryType> getEntryTypes()
 	{
 		return entryTypes;
+	}
+
+	public boolean isRecurse()
+	{
+		return recurse;
 	}
 }
