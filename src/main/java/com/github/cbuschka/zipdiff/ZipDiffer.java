@@ -55,11 +55,21 @@ public class ZipDiffer
 				}
 				else
 				{
-					if (aEntry.getCrc() != bEntry.getCrc())
+					if (aEntry.getChecksum().compareTo(bEntry.getChecksum()) != 0)
 					{
 						zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.MODIFIED, aEntry, bEntry));
 						alreadyProcessedSet.add(bEntry);
 						alreadyProcessedSet.add(aEntry);
+
+						if (aEntry.getZipIndex() != null && bEntry.getZipIndex() != null)
+						{
+							ZipDiffer subDiffer = new ZipDiffer();
+							ZipDiff subDiff = subDiffer.diff(aEntry.getZipIndex(), bEntry.getZipIndex());
+							for (ZipDiffEntry subDiffEntry : subDiff.getEntries())
+							{
+								zipDiff.addEntry(subDiffEntry);
+							}
+						}
 					}
 					else
 					{
@@ -83,7 +93,7 @@ public class ZipDiffer
 			{
 				if (bEntry == null)
 				{
-					zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.REMOVED, aEntry, bEntry));
+					zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.DELETED, aEntry, bEntry));
 					alreadyProcessedSet.add(aEntry);
 				}
 				else
@@ -98,7 +108,7 @@ public class ZipDiffer
 					bEntry = b.getEntryByChecksum(aEntry.getChecksum());
 					if (bEntry == null)
 					{
-						zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.REMOVED, aEntry, bEntry));
+						zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.DELETED, aEntry, bEntry));
 						alreadyProcessedSet.add(bEntry);
 						alreadyProcessedSet.add(aEntry);
 					}

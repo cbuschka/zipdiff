@@ -115,7 +115,8 @@ public class ZipDifferTest
 
 	private void givenZipIndexA(String... fileWithContentPairs) throws IOException
 	{
-		this.zipIndexA = buildZipIndex("a", fileWithContentPairs);
+		ZipIndex zipIndex = buildZipIndex("a", fileWithContentPairs);
+		this.zipIndexA = zipIndex;
 	}
 
 	private ZipIndex buildZipIndex(String zipPath, String[] fileWithContentPairs) throws UnsupportedEncodingException
@@ -125,13 +126,14 @@ public class ZipDifferTest
 		{
 			String path = fileWithContentPairs[i * 2 + 0];
 			byte[] data = fileWithContentPairs[i * 2 + 1].getBytes("UTF-8");
-			entries.put(path, new ZipIndexEntry(path, checksumCalculator.calcChecksum(data), data.length, data.length, checksumCalculator.calcCrc(data), null));
+			entries.put(path, new ZipIndexEntry("", path, checksumCalculator.calcChecksum(data), data.length, data.length, checksumCalculator.calcCrc(data), null));
 		}
 		return new ZipIndex(zipPath, null, entries);
 	}
 
 	private void givenZipIndexB(String... fileWithContentPairs) throws IOException
 	{
-		this.zipIndexB = buildZipIndex("b", fileWithContentPairs);
+		ZipIndex zipIndex = buildZipIndex("b", fileWithContentPairs);
+		this.zipIndexB = zipIndex;
 	}
 }

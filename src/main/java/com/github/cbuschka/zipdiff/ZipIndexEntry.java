@@ -6,14 +6,16 @@ import java.util.Objects;
 public class ZipIndexEntry
 {
 	private final long crc;
+	private final String pathPrefix;
 	private final String path;
 	private BigInteger checksum;
 	private final long size;
 	private final long compressedSize;
 	private final ZipIndex zipIndex;
 
-	public ZipIndexEntry(String entryPath, BigInteger checksum, long entrySize, long compressedSize, long entryCrc, ZipIndex zipIndex)
+	public ZipIndexEntry(String entryPathPrefix, String entryPath, BigInteger checksum, long entrySize, long compressedSize,long entryCrc, ZipIndex zipIndex)
 	{
+		this.pathPrefix = entryPathPrefix;
 		this.path = entryPath;
 		this.zipIndex = zipIndex;
 		this.crc = entryCrc;
@@ -25,6 +27,11 @@ public class ZipIndexEntry
 	public BigInteger getChecksum()
 	{
 		return checksum;
+	}
+
+	public String getFullyQualifiedPath()
+	{
+		return this.pathPrefix + path;
 	}
 
 	public String getPath()
@@ -70,6 +77,14 @@ public class ZipIndexEntry
 	public int hashCode()
 	{
 		return Objects.hash(path);
+	}
+
+	@Override
+	public String toString()
+	{
+		return "ZipIndexEntry{" +
+				"path='" + path + '\'' +
+				'}';
 	}
 
 	public long getCompressedSize()

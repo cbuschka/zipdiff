@@ -14,7 +14,7 @@ public class ZipIndexReaderIntegrationTest
 	public void testIt() throws IOException
 	{
 		URL url = getClass().getResource("/test.zip");
-		ZipIndex zipIndex = new ZipIndexReader(url.toExternalForm(), url.openStream()).read();
+		ZipIndex zipIndex = new ZipIndexReader(url.toExternalForm(), "", url.openStream()).read();
 		Writer wr = new OutputStreamWriter(System.err, "UTF-8");
 		new ZipIndexDumper(wr).dump(zipIndex);
 		wr.close();

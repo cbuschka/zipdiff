@@ -22,19 +22,19 @@ public class StreamZipDiffWriter implements ZipDiffWriter
 			switch (entryType)
 			{
 				case ADDED:
-					this.write(entryType, entry.getOtherZipIndexEntry().getPath());
+					this.write(entryType, entry.getOtherZipIndexEntry().getFullyQualifiedPath());
 					break;
 				case DELETED:
-					this.write(entryType, entry.getZipIndexEntry().getPath());
+					this.write(entryType, entry.getZipIndexEntry().getFullyQualifiedPath());
 					break;
 				case UNCHANGED:
-					this.write(entryType, entry.getZipIndexEntry().getPath());
+					this.write(entryType, entry.getZipIndexEntry().getFullyQualifiedPath());
 					break;
 				case RENAMED:
-					this.write(entryType, entry.getZipIndexEntry().getPath(), entry.getOtherZipIndexEntry().getPath());
+					this.write(entryType, entry.getZipIndexEntry().getFullyQualifiedPath(), entry.getOtherZipIndexEntry().getFullyQualifiedPath());
 					break;
 				case MODIFIED:
-					this.write(entryType, entry.getZipIndexEntry().getPath());
+					this.write(entryType, entry.getZipIndexEntry().getFullyQualifiedPath());
 					break;
 				default:
 					throw new IllegalStateException("Unexpected entry type: " + entryType);
@@ -44,13 +44,13 @@ public class StreamZipDiffWriter implements ZipDiffWriter
 
 	private void write(ZipDiffEntryType entryType, String path) throws IOException
 	{
-		String s = String.format("%s: %s%n", entryType.name(), path);
+		String s = String.format("%s: %s\n", entryType.name(), path);
 		this.wr.write(s);
 	}
 
 	private void write(ZipDiffEntryType entryType, String pathA, String pathB) throws IOException
 	{
-		String s = String.format("%s: %s %s%n", entryType.name(), pathA, pathB);
+		String s = String.format("%s: %s %s\n", entryType.name(), pathA, pathB);
 		this.wr.write(s);
 	}
 
