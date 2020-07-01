@@ -1,5 +1,7 @@
 package com.github.cbuschka.zipdiff;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.Objects;
 
@@ -12,8 +14,9 @@ public class ZipIndexEntry
 	private final long size;
 	private final long compressedSize;
 	private final ZipIndex zipIndex;
+	private final byte[] data;
 
-	public ZipIndexEntry(String entryPathPrefix, String entryPath, BigInteger checksum, long entrySize, long compressedSize,long entryCrc, ZipIndex zipIndex)
+	public ZipIndexEntry(String entryPathPrefix, String entryPath, BigInteger checksum, long entrySize, long compressedSize, long entryCrc, byte[] data, ZipIndex zipIndex)
 	{
 		this.pathPrefix = entryPathPrefix;
 		this.path = entryPath;
@@ -22,6 +25,12 @@ public class ZipIndexEntry
 		this.compressedSize = compressedSize;
 		this.size = entrySize;
 		this.checksum = checksum;
+		this.data = data;
+	}
+
+	public InputStream getDataStream()
+	{
+		return new ByteArrayInputStream(this.data);
 	}
 
 	public BigInteger getChecksum()

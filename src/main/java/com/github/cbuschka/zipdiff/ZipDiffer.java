@@ -1,5 +1,7 @@
 package com.github.cbuschka.zipdiff;
 
+import com.j256.simplemagic.ContentInfoUtil;
+
 import java.util.HashSet;
 import java.util.Set;
 

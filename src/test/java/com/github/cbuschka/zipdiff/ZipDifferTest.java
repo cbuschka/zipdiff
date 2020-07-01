@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -125,8 +126,8 @@ public class ZipDifferTest
 		for (int i = 0; i < fileWithContentPairs.length / 2; ++i)
 		{
 			String path = fileWithContentPairs[i * 2 + 0];
-			byte[] data = fileWithContentPairs[i * 2 + 1].getBytes("UTF-8");
-			entries.put(path, new ZipIndexEntry("", path, checksumCalculator.calcChecksum(data), data.length, data.length, checksumCalculator.calcCrc(data), null));
+			byte[] data = fileWithContentPairs[i * 2 + 1].getBytes(StandardCharsets.UTF_8);
+			entries.put(path, new ZipIndexEntry("", path, checksumCalculator.calcChecksum(data), data.length, data.length, checksumCalculator.calcCrc(data), data, null));
 		}
 		return new ZipIndex(zipPath, null, entries);
 	}
