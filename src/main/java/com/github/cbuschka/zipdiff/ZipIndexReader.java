@@ -1,5 +1,8 @@
 package com.github.cbuschka.zipdiff;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -66,6 +69,8 @@ public class ZipIndexReader implements Closeable
 			return null;
 		}
 
+		byte[] data = IOUtils.toByteArray(new UnclosableInputStream(zipIn));
+
 		String entryPath = nextEntry.getName();
 		long entryCompressedSize = nextEntry.getCompressedSize();
 		long entryCrc = nextEntry.getCrc();
@@ -75,20 +80,20 @@ public class ZipIndexReader implements Closeable
 		BigInteger checksum;
 		if (isZip(entryPath))
 		{
-			subIndex = readZipIndex(entryPath);
+			subIndex = readZipIndex(entryPath, new ByteArrayInputStream(data));
 			checksum = subIndex.getChecksum();
 		}
 		else
 		{
-			checksum = this.checksumCalculator.calcChecksum(zipIn);
+			checksum = this.checksumCalculator.calcChecksum(new ByteArrayInputStream(data));
 		}
 
-		return new ZipIndexEntry(this.entryPathPrefix, entryPath, checksum, entrySize, entryCompressedSize, entryCrc, subIndex);
+		return new ZipIndexEntry(this.entryPathPrefix, entryPath, checksum, entrySize, entryCompressedSize, entryCrc, data, subIndex);
 	}
 
-	private ZipIndex readZipIndex(String entryPath) throws IOException
+	private ZipIndex readZipIndex(String entryPath, InputStream in) throws IOException
 	{
-		ZipIndexReader rd = new ZipIndexReader(this.path + "!" + entryPath, this.entryPathPrefix + entryPath + "!", new UnclosableInputStream(zipIn));
+		ZipIndexReader rd = new ZipIndexReader(this.path + "!" + entryPath, this.entryPathPrefix + entryPath + "!", in);
 		ZipIndex zipIndex = rd.read();
 		rd.close();
 		return zipIndex;

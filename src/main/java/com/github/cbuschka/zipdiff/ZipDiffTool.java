@@ -57,7 +57,7 @@ public class ZipDiffTool
 
 	private void writeDiff(ZipDiffToolArgs args, ZipDiff diff) throws IOException
 	{
-		try (ZipDiffWriter diffWriter = args.isQuiet() ? new NullZipDiffWriter() : new StreamZipDiffWriter();)
+		try (ZipDiffWriter diffWriter = args.isQuiet() ? new NullZipDiffWriter() : new StreamZipDiffWriter(args);)
 		{
 			diffWriter.write(diff);
 		}

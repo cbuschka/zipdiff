@@ -3,6 +3,7 @@ package com.github.cbuschka.zipdiff;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.algorithm.DiffAlgorithmListener;
 import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Patch;
 import com.j256.simplemagic.ContentInfo;
 import com.j256.simplemagic.ContentInfoUtil;
@@ -46,7 +47,7 @@ public class StreamZipDiffWriter implements ZipDiffWriter
 					this.write(entryType, entry.getZipIndexEntry().getFullyQualifiedPath(), entry.getOtherZipIndexEntry().getFullyQualifiedPath());
 					break;
 				case MODIFIED:
-					this.writeModified(entryType, entry.getZipIndexEntry(), entry.getOtherZipIndexEntry());
+					writeModified(entryType, entry.getZipIndexEntry(), entry.getOtherZipIndexEntry());
 					break;
 				default:
 					throw new IllegalStateException("Unexpected entry type: " + entryType);
@@ -56,40 +57,91 @@ public class StreamZipDiffWriter implements ZipDiffWriter
 
 	private void write(ZipDiffEntryType entryType, String path) throws IOException
 	{
-		String s = String.format("%s: %s%n", entryType.name(), path);
+		String s = String.format("%s: %s\n", entryType.name(), path);
 		this.wr.write(s);
 	}
 
 	private void write(ZipDiffEntryType entryType, String pathA, String pathB) throws IOException
 	{
-		String s = String.format("%s: %s %s%n", entryType.name(), pathA, pathB);
+		String s = String.format("%s: %s %s\n", entryType.name(), pathA, pathB);
 		this.wr.write(s);
 	}
 
 	private void writeModified(ZipDiffEntryType entryType, ZipIndexEntry entry, ZipIndexEntry other) throws IOException
 	{
-		String s = String.format("%s: %s %s%n", entryType.name(), entry.getFullyQualifiedPath(), other.getFullyQualifiedPath());
+		String s = String.format("%s: %s %s\n", entryType.name(), entry.getFullyQualifiedPath(), other.getFullyQualifiedPath());
 		this.wr.write(s);
 
-		if (this.toolArgs.isShowDiffs())
+		if (this.toolArgs.isShowDiffs() && canDiff(entry, other))
 		{
-			ContentInfo aContentInfo = contentInfoUtil.findMatch(entry.getDataStream());
-			ContentInfo bContentInfo = contentInfoUtil.findMatch(other.getDataStream());
-			if (aContentInfo.getMimeType().equals(bContentInfo.getMimeType()) && aContentInfo.getMimeType().startsWith("text/"))
+			try
 			{
-				try
+				String aText = IOUtils.toString(entry.getDataStream(), StandardCharsets.UTF_8);
+				String bText = IOUtils.toString(other.getDataStream(), StandardCharsets.UTF_8);
+				Patch<String> patch = DiffUtils.diff(aText, bText, (DiffAlgorithmListener) null);
+				final String DIFF_S_S = "DIFF: %s%s\n";
+				for (AbstractDelta<String> delta : patch.getDeltas())
 				{
-					String aText = IOUtils.toString(entry.getDataStream(), StandardCharsets.UTF_8);
-					String bText = IOUtils.toString(other.getDataStream(), StandardCharsets.UTF_8);
-					Patch<String> patch = DiffUtils.diff(aText, bText, (DiffAlgorithmListener) null);
-					this.wr.write(String.valueOf(patch));
-				}
-				catch (DiffException ex)
-				{
-					throw new RuntimeException(ex);
+					switch (delta.getType())
+					{
+						case INSERT:
+							for (String line : delta.getTarget().getLines())
+							{
+								this.wr.write(String.format(DIFF_S_S, "+", line.trim()));
+							}
+							break;
+						case DELETE:
+							for (String line : delta.getSource().getLines())
+							{
+								this.wr.write(String.format(DIFF_S_S, "-", line.trim()));
+							}
+							break;
+						case EQUAL:
+							for (String line : delta.getSource().getLines())
+							{
+								this.wr.write(String.format(DIFF_S_S, " ", line.trim()));
+							}
+							break;
+						case CHANGE:
+							for (String line : delta.getSource().getLines())
+							{
+								this.wr.write(String.format(DIFF_S_S, "-", line.trim()));
+							}
+							for (String line : delta.getTarget().getLines())
+							{
+								this.wr.write(String.format(DIFF_S_S, "+", line.trim()));
+							}
+							break;
+						default:
+							throw new IllegalStateException();
+					}
 				}
 			}
+			catch (DiffException ex)
+			{
+				throw new RuntimeException(ex);
+			}
 		}
+	}
+
+	private static final String[] SUFFIXES = {"/MANIFEST.MF", ".txt", ".properties", ".xml", ".xsd", ".yml", ".yaml",
+			".json", "*.java"};
+
+	private boolean canDiff(ZipIndexEntry entry, ZipIndexEntry other) throws IOException
+	{
+		for (String suffix : SUFFIXES)
+		{
+			if (entry.getPath().endsWith(suffix))
+			{
+				return true;
+			}
+		}
+
+		ContentInfo aContentInfo = contentInfoUtil.findMatch(entry.getDataStream());
+		ContentInfo bContentInfo = contentInfoUtil.findMatch(other.getDataStream());
+		return aContentInfo != null && bContentInfo != null
+				&& aContentInfo.getMimeType().equals(bContentInfo.getMimeType())
+				&& aContentInfo.getMimeType().startsWith("text/");
 	}
 
 	@Override

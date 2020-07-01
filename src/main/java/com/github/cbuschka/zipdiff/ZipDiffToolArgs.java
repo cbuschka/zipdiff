@@ -7,11 +7,8 @@ import java.util.Set;
 
 public class ZipDiffToolArgs
 {
-<<<<<<<HEAD
 	private final boolean recurse;
-=======
 	private boolean showDiffs;
->>>>>>>ee2f28d...morDROP-3690
 	private boolean usageRequested;
 	private boolean quiet;
 	private Options options;
