@@ -69,9 +69,6 @@ public class StreamZipDiffWriter implements ZipDiffWriter
 
 	private void writeModified(ZipDiffEntryType entryType, ZipIndexEntry entry, ZipIndexEntry other) throws IOException
 	{
-		String s = String.format("%s: %s %s\n", entryType.name(), entry.getFullyQualifiedPath(), other.getFullyQualifiedPath());
-		this.wr.write(s);
-
 		if (this.toolArgs.isShowDiffs() && canDiff(entry, other))
 		{
 			try
@@ -121,6 +118,11 @@ public class StreamZipDiffWriter implements ZipDiffWriter
 			{
 				throw new RuntimeException(ex);
 			}
+		}
+		else
+		{
+			String s = String.format("%s: %s %s\n", entryType.name(), entry.getFullyQualifiedPath(), other.getFullyQualifiedPath());
+			this.wr.write(s);
 		}
 	}
 

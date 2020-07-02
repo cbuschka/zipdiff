@@ -1,8 +1,8 @@
 package com.github.cbuschka.zipdiff;
 
-import com.j256.simplemagic.ContentInfoUtil;
-
+import java.math.BigInteger;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ZipDiffer
@@ -40,7 +40,7 @@ public class ZipDiffer
 				continue;
 			}
 
-			ZipIndexEntry bEntry = b.getEntryByPath(aEntry.getPath());
+			ZipIndexEntry bEntry = getUnprocessedZipIndexEntryByPath(b, aEntry.getPath(), alreadyProcessedSet);
 			if (aEntry.isFolder())
 			{
 				processAFolder(aEntry, bEntry, zipDiff, alreadyProcessedSet);
@@ -56,7 +56,7 @@ public class ZipDiffer
 	{
 		if (bEntry == null)
 		{
-			bEntry = b.getEntryByChecksum(aEntry.getChecksum());
+			bEntry = getUnprocessedZipIndexEntryByChecksum(b, aEntry.getChecksum(), alreadyProcessedSet);
 			if (bEntry == null)
 			{
 				zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.DELETED, aEntry, bEntry));
@@ -92,7 +92,7 @@ public class ZipDiffer
 				continue;
 			}
 
-			ZipIndexEntry aEntry = a.getEntryByPath(bEntry.getPath());
+			ZipIndexEntry aEntry = getUnprocessedZipIndexEntryByPath(a, bEntry.getPath(), alreadyProcessedSet);
 			if (bEntry.isFolder())
 			{
 				processBFolder(bEntry, aEntry, zipDiff, alreadyProcessedSet);
@@ -108,7 +108,13 @@ public class ZipDiffer
 	{
 		if (aEntry == null)
 		{
-			aEntry = a.getEntryByChecksum(bEntry.getChecksum());
+			aEntry = getUnprocessedZipIndexEntryByChecksum(a, bEntry.getChecksum(), alreadyProcessedSet);
+
+			if (alreadyProcessedSet.contains(aEntry))
+			{
+				aEntry = null;
+			}
+
 			if (aEntry == null)
 			{
 				onBFileAdded(bEntry, zipDiff, alreadyProcessedSet);
@@ -138,6 +144,31 @@ public class ZipDiffer
 		}
 	}
 
+	private ZipIndexEntry getUnprocessedZipIndexEntryByPath(ZipIndex zipIndex, String path, Set<ZipIndexEntry> alreadyProcessedSet)
+	{
+		ZipIndexEntry entryByPath = zipIndex.getEntryByPath(path);
+		if (alreadyProcessedSet.contains(entryByPath))
+		{
+			return null;
+		}
+
+		return entryByPath;
+	}
+
+	private ZipIndexEntry getUnprocessedZipIndexEntryByChecksum(ZipIndex zipIndex, BigInteger checksum, Set<ZipIndexEntry> alreadyProcessedSet)
+	{
+		List<ZipIndexEntry> entriesByChecksum = zipIndex.getEntriesByChecksum(checksum);
+		for (ZipIndexEntry entryByChecksum : entriesByChecksum)
+		{
+			if (!alreadyProcessedSet.contains(entryByChecksum))
+			{
+				return entryByChecksum;
+			}
+		}
+
+		return null;
+	}
+
 	private void diffModifiedBFile(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipDiff zipDiff)
 	{
 		ZipDiff subDiff = diff(aEntry.getZipIndex(), bEntry.getZipIndex());
@@ -147,14 +178,16 @@ public class ZipDiffer
 		}
 	}
 
-	private void onBFileModified(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipDiff zipDiff, Set<ZipIndexEntry> alreadyProcessedSet)
+	private void onBFileModified(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipDiff
+			zipDiff, Set<ZipIndexEntry> alreadyProcessedSet)
 	{
 		zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.MODIFIED, aEntry, bEntry));
 		alreadyProcessedSet.add(bEntry);
 		alreadyProcessedSet.add(aEntry);
 	}
 
-	private void onBFileRenamed(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipDiff zipDiff, Set<ZipIndexEntry> alreadyProcessedSet)
+	private void onBFileRenamed(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipDiff
+			zipDiff, Set<ZipIndexEntry> alreadyProcessedSet)
 	{
 		zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.RENAMED, aEntry, bEntry));
 		alreadyProcessedSet.add(bEntry);
@@ -167,7 +200,8 @@ public class ZipDiffer
 		alreadyProcessedSet.add(bEntry);
 	}
 
-	private void processBFolder(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipDiff zipDiff, Set<ZipIndexEntry> alreadyProcessedSet)
+	private void processBFolder(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipDiff
+			zipDiff, Set<ZipIndexEntry> alreadyProcessedSet)
 	{
 		if (aEntry == null)
 		{
@@ -179,14 +213,16 @@ public class ZipDiffer
 		}
 	}
 
-	private void onBFolderUnchanged(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipDiff zipDiff, Set<ZipIndexEntry> alreadyProcessedSet)
+	private void onBFolderUnchanged(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipDiff
+			zipDiff, Set<ZipIndexEntry> alreadyProcessedSet)
 	{
 		zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.UNCHANGED, aEntry, bEntry));
 		alreadyProcessedSet.add(bEntry);
 		alreadyProcessedSet.add(aEntry);
 	}
 
-	private void onBFolderAdded(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipDiff zipDiff, Set<ZipIndexEntry> alreadyProcessedSet)
+	private void onBFolderAdded(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipDiff
+			zipDiff, Set<ZipIndexEntry> alreadyProcessedSet)
 	{
 		zipDiff.addEntry(new ZipDiffEntry(ZipDiffEntryType.ADDED, aEntry, bEntry));
 		alreadyProcessedSet.add(bEntry);
