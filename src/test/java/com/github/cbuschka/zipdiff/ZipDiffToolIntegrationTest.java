@@ -9,9 +9,9 @@ import java.io.IOException;
 public class ZipDiffToolIntegrationTest
 {
 	@Rule
-	public TestZipFile aZip = new TestZipFile("a.zip");
+	public TestZipFile aZip = TestZipFile.from("a.zip");
 	@Rule
-	public TestZipFile bZip = new TestZipFile("b.zip");
+	public TestZipFile bZip = TestZipFile.from("b.zip");
 
 	private ZipDiffTool zipDiffTool = new ZipDiffTool();
 

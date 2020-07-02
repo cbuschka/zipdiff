@@ -7,7 +7,7 @@ public class ZipDiff
 {
 	private List<ZipDiffEntry> entries = new ArrayList<>();
 
-	public Iterable<ZipDiffEntry> getEntries()
+	public List<ZipDiffEntry> getEntries()
 	{
 		return this.entries;
 	}

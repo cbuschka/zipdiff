@@ -31,7 +31,7 @@ public class ZipIndexReader implements Closeable
 		{
 			String path = f.toURI().toURL().toExternalForm();
 			FileInputStream zipDataIn = new FileInputStream(f);
-			return new ZipIndexReader(path, "", zipDataIn);
+			return new ZipIndexReader(path, f.getAbsolutePath(), zipDataIn);
 		}
 		catch (IOException ex)
 		{

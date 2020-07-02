@@ -79,21 +79,33 @@ public class ZipIndexEntry
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		ZipIndexEntry that = (ZipIndexEntry) o;
-		return path.equals(that.path);
+		if (!this.path.equals(that.path))
+		{
+			return false;
+		}
+
+		if (this.pathPrefix == null && that.pathPrefix == null)
+		{
+			return true;
+		}
+		else
+		{
+			return this.pathPrefix != null && this.pathPrefix.equals(that.pathPrefix);
+		}
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(path);
+		return Objects.hash(pathPrefix, path);
 	}
 
 	@Override
 	public String toString()
 	{
 		return "ZipIndexEntry{" +
-				"path='" + path + '\'' +
-				'}';
+				"pathPrefix=" + this.pathPrefix +
+				",path=" + path + "}";
 	}
 
 	public long getCompressedSize()

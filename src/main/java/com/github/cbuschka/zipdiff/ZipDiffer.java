@@ -109,12 +109,6 @@ public class ZipDiffer
 		if (aEntry == null)
 		{
 			aEntry = getUnprocessedZipIndexEntryByChecksum(a, bEntry.getChecksum(), alreadyProcessedSet);
-
-			if (alreadyProcessedSet.contains(aEntry))
-			{
-				aEntry = null;
-			}
-
 			if (aEntry == null)
 			{
 				onBFileAdded(bEntry, zipDiff, alreadyProcessedSet);
