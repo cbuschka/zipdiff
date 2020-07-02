@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-public class ZipDiffToolIntegrationTest
+public class ZipDiffToolTest
 {
 	@Rule
 	public TestZipFile aZip = TestZipFile.from("a.zip");

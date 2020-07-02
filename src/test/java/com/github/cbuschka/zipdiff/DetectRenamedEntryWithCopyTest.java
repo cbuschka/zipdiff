@@ -8,7 +8,7 @@ import java.io.IOException;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class DetectRenamedEntryWithCopyIntegrationTest
+public class DetectRenamedEntryWithCopyTest
 {
 	@Rule
 	public TestZipFile zipA = TestZipFile.from(TestZipFileBuilder.newZipFile()
