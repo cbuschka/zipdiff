@@ -11,7 +11,7 @@ public class ZipDiffTool
 {
 	private ZipDiffToolArgsParser argsParser = new ZipDiffToolArgsParser();
 	private Function<File, ZipIndexReader> zipIndexReaderOpener = ZipIndexReader::open;
-	private ZipDiffer zipDiffer = new ZipDiffer(true);
+	private ZipIndexDiffer zipIndexDiffer = new ZipIndexDiffer(true);
 
 	public int run(String... args) throws IOException, ParseException
 	{
@@ -39,25 +39,25 @@ public class ZipDiffTool
 
 	private int runDiff(ZipDiffToolArgs toolArgs) throws IOException
 	{
-		this.zipDiffer.setRecurse(toolArgs.isRecurse());
+		this.zipIndexDiffer.setRecurse(toolArgs.isRecurse());
 
-		ZipDiff diff = calcDiff(toolArgs.getFileA(), toolArgs.getFileB());
+		ZipIndexDiff diff = calcDiff(toolArgs.getFileA(), toolArgs.getFileB());
 
 		writeDiff(toolArgs, diff);
 
 		return diff.containsChanges() ? 1 : 0;
 	}
 
-	private ZipDiff calcDiff(File a, File b) throws IOException
+	private ZipIndexDiff calcDiff(File a, File b) throws IOException
 	{
 		ZipIndex indexA = readZipIndexFrom(a);
 		ZipIndex indexB = readZipIndexFrom(b);
-		return zipDiffer.diff(indexA, indexB);
+		return zipIndexDiffer.diff(indexA, indexB);
 	}
 
-	private void writeDiff(ZipDiffToolArgs args, ZipDiff diff) throws IOException
+	private void writeDiff(ZipDiffToolArgs args, ZipIndexDiff diff) throws IOException
 	{
-		try (ZipDiffWriter diffWriter = args.isQuiet() ? new NullZipDiffWriter() : new StreamZipDiffWriter();)
+		try (ZipDiffWriter diffWriter = args.isQuiet() ? new NullZipDiffWriter() : new StreamZipDiffWriter(args);)
 		{
 			diffWriter.write(diff);
 		}

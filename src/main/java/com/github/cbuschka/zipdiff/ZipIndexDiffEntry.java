@@ -1,14 +1,14 @@
 package com.github.cbuschka.zipdiff;
 
-public class ZipDiffEntry
+public class ZipIndexDiffEntry
 {
-	private ZipDiffEntryType type;
+	private ZipIndexDiffEntryType type;
 
 	private ZipIndexEntry zipIndexEntry;
 
 	private ZipIndexEntry otherZipIndexEntry;
 
-	public ZipDiffEntry(ZipDiffEntryType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	public ZipIndexDiffEntry(ZipIndexDiffEntryType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
 		this.type = type;
 		this.zipIndexEntry = zipIndexEntry;
@@ -20,7 +20,7 @@ public class ZipDiffEntry
 		return zipIndexEntry;
 	}
 
-	public ZipDiffEntryType getType()
+	public ZipIndexDiffEntryType getType()
 	{
 		return type;
 	}

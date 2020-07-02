@@ -1,6 +1,8 @@
 package com.github.cbuschka.zipdiff;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ZipIndex
@@ -41,16 +43,17 @@ public class ZipIndex
 		return this.entries.get(path);
 	}
 
-	public ZipIndexEntry getEntryByChecksum(BigInteger checksum)
+	public List<ZipIndexEntry> getEntriesByChecksum(BigInteger checksum)
 	{
+		List<ZipIndexEntry> entries = new ArrayList<>();
 		for (Map.Entry<String, ZipIndexEntry> mapEntry : this.entries.entrySet())
 		{
 			if (mapEntry.getValue().getChecksum().equals(checksum))
 			{
-				return mapEntry.getValue();
+				entries.add(mapEntry.getValue());
 			}
 		}
 
-		return null;
+		return entries;
 	}
 }

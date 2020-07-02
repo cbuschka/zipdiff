@@ -4,21 +4,22 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class ZipDifferTest
+public class ZipIndexDifferTest
 {
 	private ChecksumCalculator checksumCalculator = new ChecksumCalculator();
 
 	private ZipIndex zipIndexA;
 	private ZipIndex zipIndexB;
 
-	private ZipDiffer differ = new ZipDiffer(true);
-	private ZipDiff zipDiff;
+	private ZipIndexDiffer differ = new ZipIndexDiffer(true);
+	private ZipIndexDiff zipIndexDiff;
 
 	@Test
 	public void detectAdded() throws Exception
@@ -74,43 +75,43 @@ public class ZipDifferTest
 
 	private void thenFileIsKept(String path)
 	{
-		ZipDiffEntry zipDiffEntry = this.zipDiff.getEntryByPath(path);
-		assertThat(zipDiffEntry.getType(), is(ZipDiffEntryType.UNCHANGED));
+		ZipIndexDiffEntry zipIndexDiffEntry = this.zipIndexDiff.getEntryByPath(path);
+		assertThat(zipIndexDiffEntry.getType(), is(ZipIndexDiffEntryType.UNCHANGED));
 	}
 
 	private void thenFileIsRenamed(String path, String newPath)
 	{
-		ZipDiffEntry zipDiffEntry = this.zipDiff.getEntryByPath(path);
-		assertThat(zipDiffEntry.getType(), is(ZipDiffEntryType.RENAMED));
-		assertThat(zipDiffEntry.getOtherZipIndexEntry().getPath(), is(newPath));
+		ZipIndexDiffEntry zipIndexDiffEntry = this.zipIndexDiff.getEntryByPath(path);
+		assertThat(zipIndexDiffEntry.getType(), is(ZipIndexDiffEntryType.RENAMED));
+		assertThat(zipIndexDiffEntry.getOtherZipIndexEntry().getPath(), is(newPath));
 	}
 
 	private void thenFileIsRemoved(String path)
 	{
-		ZipDiffEntry zipDiffEntry = this.zipDiff.getEntryByPath(path);
-		assertThat(zipDiffEntry.getType(), is(ZipDiffEntryType.DELETED));
+		ZipIndexDiffEntry zipIndexDiffEntry = this.zipIndexDiff.getEntryByPath(path);
+		assertThat(zipIndexDiffEntry.getType(), is(ZipIndexDiffEntryType.DELETED));
 	}
 
 	private void thenFileIsAdded(String path)
 	{
-		ZipDiffEntry zipDiffEntry = this.zipDiff.getEntryByOtherPath(path);
-		assertThat(zipDiffEntry.getType(), is(ZipDiffEntryType.ADDED));
+		ZipIndexDiffEntry zipIndexDiffEntry = this.zipIndexDiff.getEntryByOtherPath(path);
+		assertThat(zipIndexDiffEntry.getType(), is(ZipIndexDiffEntryType.ADDED));
 	}
 
 	private void thenFileIsChanged(String path)
 	{
-		ZipDiffEntry zipDiffEntry = this.zipDiff.getEntryByOtherPath(path);
-		assertThat(zipDiffEntry.getType(), is(ZipDiffEntryType.MODIFIED));
+		ZipIndexDiffEntry zipIndexDiffEntry = this.zipIndexDiff.getEntryByOtherPath(path);
+		assertThat(zipIndexDiffEntry.getType(), is(ZipIndexDiffEntryType.MODIFIED));
 	}
 
 	private void thenDiffEntryCountIs(int n)
 	{
-		assertThat(this.zipDiff.size(), is(n));
+		assertThat(this.zipIndexDiff.size(), is(n));
 	}
 
 	private void whenDiffed()
 	{
-		zipDiff = this.differ.diff(this.zipIndexA, this.zipIndexB);
+		zipIndexDiff = this.differ.diff(this.zipIndexA, this.zipIndexB);
 	}
 
 	private void givenZipIndexA(String... fileWithContentPairs) throws IOException
@@ -125,8 +126,8 @@ public class ZipDifferTest
 		for (int i = 0; i < fileWithContentPairs.length / 2; ++i)
 		{
 			String path = fileWithContentPairs[i * 2 + 0];
-			byte[] data = fileWithContentPairs[i * 2 + 1].getBytes("UTF-8");
-			entries.put(path, new ZipIndexEntry("", path, checksumCalculator.calcChecksum(data), data.length, data.length, checksumCalculator.calcCrc(data), null));
+			byte[] data = fileWithContentPairs[i * 2 + 1].getBytes(StandardCharsets.UTF_8);
+			entries.put(path, new ZipIndexEntry("location", "", path, checksumCalculator.calcChecksum(data), data.length, data.length, checksumCalculator.calcCrc(data), data, null));
 		}
 		return new ZipIndex(zipPath, null, entries);
 	}

@@ -1,6 +1,6 @@
 package com.github.cbuschka.zipdiff;
 
-public enum ZipDiffEntryType
+public enum ZipIndexDiffEntryType
 {
 	UNCHANGED,
 	RENAMED,

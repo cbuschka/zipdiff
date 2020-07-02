@@ -5,7 +5,7 @@ import java.io.IOException;
 public class NullZipDiffWriter implements ZipDiffWriter
 {
 	@Override
-	public void write(ZipDiff diff) throws IOException
+	public void write(ZipIndexDiff diff) throws IOException
 	{
 	}
 
