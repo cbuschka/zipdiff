@@ -128,11 +128,13 @@ public class ZipDiffer
 		{
 			if (aEntry.getChecksum().compareTo(bEntry.getChecksum()) != 0)
 			{
-				onBFileModified(bEntry, aEntry, zipDiff, alreadyProcessedSet);
-
 				if (this.recurse && aEntry.getZipIndex() != null && bEntry.getZipIndex() != null)
 				{
 					diffModifiedBFile(bEntry, aEntry, zipDiff);
+				}
+				else
+				{
+					onBFileModified(bEntry, aEntry, zipDiff, alreadyProcessedSet);
 				}
 			}
 			else
