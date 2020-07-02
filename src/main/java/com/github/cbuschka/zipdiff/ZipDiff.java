@@ -5,7 +5,26 @@ import java.util.List;
 
 public class ZipDiff
 {
+	private ZipIndex indexA;
+	private ZipIndex indexB;
+
 	private List<ZipDiffEntry> entries = new ArrayList<>();
+
+	public ZipDiff(ZipIndex a, ZipIndex b)
+	{
+		this.indexA = a;
+		this.indexB = b;
+	}
+
+	public ZipIndex getIndexA()
+	{
+		return indexA;
+	}
+
+	public ZipIndex getIndexB()
+	{
+		return indexB;
+	}
 
 	public List<ZipDiffEntry> getEntries()
 	{

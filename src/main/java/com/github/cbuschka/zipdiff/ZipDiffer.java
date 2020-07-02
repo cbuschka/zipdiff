@@ -21,7 +21,7 @@ public class ZipDiffer
 
 	public ZipDiff diff(ZipIndex a, ZipIndex b)
 	{
-		ZipDiff zipDiff = new ZipDiff();
+		ZipDiff zipDiff = new ZipDiff(a, b);
 
 		Set<ZipIndexEntry> alreadyProcessedSet = new HashSet<>();
 

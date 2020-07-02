@@ -21,8 +21,9 @@ public class ZipIndexReader implements Closeable
 {
 	private ChecksumCalculator checksumCalculator = new ChecksumCalculator();
 	private final ZipInputStream zipIn;
+	private final String location;
 	private final String path;
-	private final String entryPathPrefix;
+	private final String parentPath;
 	private final MessageDigest zipMessageDigest;
 
 	public static ZipIndexReader open(File f)
@@ -31,7 +32,7 @@ public class ZipIndexReader implements Closeable
 		{
 			String path = f.toURI().toURL().toExternalForm();
 			FileInputStream zipDataIn = new FileInputStream(f);
-			return new ZipIndexReader(path, f.getAbsolutePath(), zipDataIn);
+			return new ZipIndexReader(f.getAbsolutePath(), "", "", zipDataIn);
 		}
 		catch (IOException ex)
 		{
@@ -39,10 +40,11 @@ public class ZipIndexReader implements Closeable
 		}
 	}
 
-	public ZipIndexReader(String path, String entryPathPrefix, InputStream zipDataIn)
+	public ZipIndexReader(String location, String parentPath, String path, InputStream zipDataIn)
 	{
+		this.location = location;
 		this.path = path;
-		this.entryPathPrefix = entryPathPrefix;
+		this.parentPath = parentPath;
 		this.zipMessageDigest = this.checksumCalculator.newChecksumMessageDigest();
 		this.zipIn = new ZipInputStream(new DigestInputStream(zipDataIn, zipMessageDigest));
 	}
@@ -88,12 +90,12 @@ public class ZipIndexReader implements Closeable
 			checksum = this.checksumCalculator.calcChecksum(new ByteArrayInputStream(data));
 		}
 
-		return new ZipIndexEntry(this.entryPathPrefix, entryPath, checksum, entrySize, entryCompressedSize, entryCrc, data, subIndex);
+		return new ZipIndexEntry(this.location, this.parentPath.isEmpty() ? "" : this.parentPath + "!", entryPath, checksum, entrySize, entryCompressedSize, entryCrc, data, subIndex);
 	}
 
 	private ZipIndex readZipIndex(String entryPath, InputStream in) throws IOException
 	{
-		ZipIndexReader rd = new ZipIndexReader(this.path + "!" + entryPath, this.entryPathPrefix + entryPath + "!", in);
+		ZipIndexReader rd = new ZipIndexReader(this.location, this.parentPath + entryPath + "!", this.path + "!" + entryPath, in);
 		ZipIndex zipIndex = rd.read();
 		rd.close();
 		return zipIndex;

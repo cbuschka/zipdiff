@@ -8,6 +8,7 @@ import java.util.Objects;
 public class ZipIndexEntry
 {
 	private final long crc;
+	private final String location;
 	private final String pathPrefix;
 	private final String path;
 	private BigInteger checksum;
@@ -16,10 +17,11 @@ public class ZipIndexEntry
 	private final ZipIndex zipIndex;
 	private final byte[] data;
 
-	public ZipIndexEntry(String entryPathPrefix, String entryPath, BigInteger checksum, long entrySize, long compressedSize, long entryCrc, byte[] data, ZipIndex zipIndex)
+	public ZipIndexEntry(String location, String parentPath, String path, BigInteger checksum, long entrySize, long compressedSize, long entryCrc, byte[] data, ZipIndex zipIndex)
 	{
-		this.pathPrefix = entryPathPrefix;
-		this.path = entryPath;
+		this.location = location;
+		this.pathPrefix = parentPath;
+		this.path = path;
 		this.zipIndex = zipIndex;
 		this.crc = entryCrc;
 		this.compressedSize = compressedSize;
@@ -79,19 +81,18 @@ public class ZipIndexEntry
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		ZipIndexEntry that = (ZipIndexEntry) o;
-		if (!this.path.equals(that.path))
-		{
-			return false;
-		}
+		return this.path.equals(that.path)
+				&& this.location.equals(that.location);
+	}
 
-		if (this.pathPrefix == null && that.pathPrefix == null)
-		{
-			return true;
-		}
-		else
-		{
-			return this.pathPrefix != null && this.pathPrefix.equals(that.pathPrefix);
-		}
+	public String getLocation()
+	{
+		return location;
+	}
+
+	public String getPathPrefix()
+	{
+		return pathPrefix;
 	}
 
 	@Override
@@ -104,7 +105,7 @@ public class ZipIndexEntry
 	public String toString()
 	{
 		return "ZipIndexEntry{" +
-				"pathPrefix=" + this.pathPrefix +
+				"location=" + this.location +
 				",path=" + path + "}";
 	}
 

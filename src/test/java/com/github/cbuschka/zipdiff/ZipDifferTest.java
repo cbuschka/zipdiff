@@ -127,7 +127,7 @@ public class ZipDifferTest
 		{
 			String path = fileWithContentPairs[i * 2 + 0];
 			byte[] data = fileWithContentPairs[i * 2 + 1].getBytes(StandardCharsets.UTF_8);
-			entries.put(path, new ZipIndexEntry("", path, checksumCalculator.calcChecksum(data), data.length, data.length, checksumCalculator.calcCrc(data), data, null));
+			entries.put(path, new ZipIndexEntry("location", "", path, checksumCalculator.calcChecksum(data), data.length, data.length, checksumCalculator.calcCrc(data), data, null));
 		}
 		return new ZipIndex(zipPath, null, entries);
 	}
