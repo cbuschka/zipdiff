@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=1.0.1
+VERSION=1.0.2
 ZIPDIFF_DIR=${HOME}/.zipdiff/${VERSION}
 ZIPDIFF_JAR=${ZIPDIFF_DIR}/zipdiff.jar
 
