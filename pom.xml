@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.cbuschka.zipdiff</groupId>
     <artifactId>zipdiff</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <packaging>jar</packaging>
     <name>A tool to diff two zips.</name>
     <description>A tool to diff two zips.</description>
@@ -13,7 +13,7 @@
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/cbuschka/zipdiff</developerConnection>
         <connection>scm:git:ssh://git@github.com/cbuschka/zipdiff</connection>
-        <tag>HEAD</tag>
+        <tag>zipdiff-1.0.2</tag>
     </scm>
     <url>https://github.com/cbuschka/zipdiff</url>
     <developers>
