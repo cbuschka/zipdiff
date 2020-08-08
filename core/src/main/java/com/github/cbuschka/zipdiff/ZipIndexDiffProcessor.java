@@ -12,104 +12,79 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class ZipDiffWriter implements AutoCloseable
+public class ZipIndexDiffProcessor
 {
 	private ContentInfoUtil contentInfoUtil = new ContentInfoUtil();
-	private StringOut stringOut;
+	private ZipIndexDiffHandler handler;
 	private boolean showDiffs;
 
-	public ZipDiffWriter(StringOut stringOut, boolean showDiffs)
+	public ZipIndexDiffProcessor(ZipIndexDiffHandler handler, boolean showDiffs)
 	{
 		this.showDiffs = showDiffs;
-		this.stringOut = stringOut;
+		this.handler = handler;
 	}
 
-	public void write(ZipIndexDiff diff) throws IOException
+	public void process(ZipIndexDiff diff) throws IOException
 	{
+		this.handler.begin(diff);
 		for (ZipIndexDiffEntry entry : diff.getEntries())
 		{
 			ZipIndexDiffEntryType entryType = entry.getType();
 			switch (entryType)
 			{
 				case ADDED:
-					this.write(entryType, entry.getOtherZipIndexEntry().getFullyQualifiedPath());
+					this.handler.added(entry.getOtherZipIndexEntry());
 					break;
 				case DELETED:
-					this.write(entryType, entry.getZipIndexEntry().getFullyQualifiedPath());
+					this.handler.deleted(entry.getZipIndexEntry());
 					break;
 				case UNCHANGED:
-					this.write(entryType, entry.getZipIndexEntry().getFullyQualifiedPath());
+					this.handler.unchanged(entry.getZipIndexEntry(), entry.getOtherZipIndexEntry());
 					break;
 				case RENAMED:
-					this.write(entryType, entry.getZipIndexEntry().getFullyQualifiedPath(), entry.getOtherZipIndexEntry().getFullyQualifiedPath());
+					this.handler.renamed(entry.getZipIndexEntry(), entry.getOtherZipIndexEntry());
 					break;
 				case MODIFIED:
-					writeModified(entryType, entry.getZipIndexEntry(), entry.getOtherZipIndexEntry());
+					handleModified(entryType, entry.getZipIndexEntry(), entry.getOtherZipIndexEntry());
 					break;
 				default:
 					throw new IllegalStateException("Unexpected entry type: " + entryType);
 			}
 		}
+		this.handler.finished();
 	}
 
-	private void write(ZipIndexDiffEntryType entryType, String path) throws IOException
-	{
-		String s = String.format("%s: %s\n", entryType.name(), path);
-		this.stringOut.write(s);
-	}
-
-	private void write(ZipIndexDiffEntryType entryType, String pathA, String pathB) throws IOException
-	{
-		String s = String.format("%s: %s %s\n", entryType.name(), pathA, pathB);
-		this.stringOut.write(s);
-	}
-
-	private void writeModified(ZipIndexDiffEntryType entryType, ZipIndexEntry entry, ZipIndexEntry other) throws IOException
+	private void handleModified(ZipIndexDiffEntryType entryType, ZipIndexEntry entry, ZipIndexEntry other) throws IOException
 	{
 		if (this.showDiffs && canDiff(entry, other))
 		{
+			this.handler.startContentModified(entry, other);
 			try
 			{
 				String aText = IOUtils.toString(entry.getDataStream(), StandardCharsets.UTF_8);
 				String bText = IOUtils.toString(other.getDataStream(), StandardCharsets.UTF_8);
 				Patch<String> patch = DiffUtils.diff(aText, bText, (DiffAlgorithmListener) null);
-				final String DIFF_S_S = "DIFF: %s%s\n";
 				for (AbstractDelta<String> delta : patch.getDeltas())
 				{
 					switch (delta.getType())
 					{
 						case INSERT:
-							for (String line : delta.getTarget().getLines())
-							{
-								this.stringOut.write(String.format(DIFF_S_S, "+", line.trim()));
-							}
+							this.handler.modifiedContentInserted(delta.getTarget().getLines());
 							break;
 						case DELETE:
-							for (String line : delta.getSource().getLines())
-							{
-								this.stringOut.write(String.format(DIFF_S_S, "-", line.trim()));
-							}
+							this.handler.modifiedContentDeleted(delta.getSource().getLines());
 							break;
 						case EQUAL:
-							for (String line : delta.getSource().getLines())
-							{
-								this.stringOut.write(String.format(DIFF_S_S, " ", line.trim()));
-							}
+							this.handler.modifiedContentEqual(delta.getSource().getLines());
 							break;
 						case CHANGE:
-							for (String line : delta.getSource().getLines())
-							{
-								this.stringOut.write(String.format(DIFF_S_S, "-", line.trim()));
-							}
-							for (String line : delta.getTarget().getLines())
-							{
-								this.stringOut.write(String.format(DIFF_S_S, "+", line.trim()));
-							}
+							this.handler.modifiedContentChanged(delta.getSource().getLines(), delta.getTarget().getLines());
 							break;
 						default:
 							throw new IllegalStateException();
 					}
 				}
+				this.handler.endContentModified();
 			}
 			catch (DiffException ex)
 			{
@@ -118,8 +93,7 @@ public class ZipDiffWriter implements AutoCloseable
 		}
 		else
 		{
-			String s = String.format("%s: %s %s\n", entryType.name(), entry.getFullyQualifiedPath(), other.getFullyQualifiedPath());
-			this.stringOut.write(s);
+			this.handler.modified(entry, other);
 		}
 	}
 
@@ -141,10 +115,5 @@ public class ZipDiffWriter implements AutoCloseable
 		return aContentInfo != null && bContentInfo != null
 				&& aContentInfo.getMimeType().equals(bContentInfo.getMimeType())
 				&& aContentInfo.getMimeType().startsWith("text/");
-	}
-
-	public void close() throws IOException
-	{
-		this.stringOut.close();
 	}
 }

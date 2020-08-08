@@ -32,7 +32,6 @@ public class VerifyMojo extends AbstractMojo
 			log.info(String.format("File b: %s", b.getAbsolutePath()));
 
 			ZipIndexDiff zipIndexDiff = diff();
-
 			dump(zipIndexDiff);
 		}
 		catch (IOException ex)
@@ -43,10 +42,8 @@ public class VerifyMojo extends AbstractMojo
 
 	private void dump(ZipIndexDiff zipIndexDiff) throws IOException
 	{
-		try (ZipDiffWriter diffWriter = new ZipDiffWriter(this.quiet ? new NullStringOut() : new MavenStringOut(getLog()), true))
-		{
-			diffWriter.write(zipIndexDiff);
-		}
+		ZipIndexDiffProcessor diffProcessor = new ZipIndexDiffProcessor(new ZipIndexDiffWriter(this.quiet ? new NullStringOut() : new MavenStringOut(getLog())), true);
+		diffProcessor.process(zipIndexDiff);
 	}
 
 	private ZipIndexDiff diff() throws IOException
