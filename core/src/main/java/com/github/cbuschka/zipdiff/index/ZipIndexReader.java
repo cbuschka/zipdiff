@@ -1,5 +1,6 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.index;
 
+import com.github.cbuschka.zipdiff.io.UnclosableInputStream;
 import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;

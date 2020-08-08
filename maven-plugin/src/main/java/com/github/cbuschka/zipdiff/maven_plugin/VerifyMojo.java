@@ -1,5 +1,12 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.maven_plugin;
 
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffer;
+import com.github.cbuschka.zipdiff.index.ZipIndex;
+import com.github.cbuschka.zipdiff.index.ZipIndexReader;
+import com.github.cbuschka.zipdiff.io.NullStringOut;
+import com.github.cbuschka.zipdiff.process.ZipIndexDiffProcessor;
+import com.github.cbuschka.zipdiff.report.ZipIndexDiffWriter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;

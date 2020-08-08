@@ -1,5 +1,12 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.diff;
 
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntry;
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffer;
+import com.github.cbuschka.zipdiff.index.ChecksumCalculator;
+import com.github.cbuschka.zipdiff.index.ZipIndex;
+import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 import org.junit.Test;
 
 import java.io.IOException;

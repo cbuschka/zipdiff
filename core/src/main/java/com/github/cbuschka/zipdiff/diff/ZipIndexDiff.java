@@ -1,4 +1,6 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.diff;
+
+import com.github.cbuschka.zipdiff.index.ZipIndex;
 
 import java.util.ArrayList;
 import java.util.List;

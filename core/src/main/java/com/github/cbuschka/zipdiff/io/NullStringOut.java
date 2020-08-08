@@ -1,7 +1,6 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.io;
 
 import java.io.IOException;
-import java.io.Writer;
 
 public class NullStringOut implements StringOut
 {

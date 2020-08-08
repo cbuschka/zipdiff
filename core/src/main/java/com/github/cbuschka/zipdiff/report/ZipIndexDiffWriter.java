@@ -1,4 +1,10 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.report;
+
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffHandler;
+import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
+import com.github.cbuschka.zipdiff.io.StringOut;
 
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;

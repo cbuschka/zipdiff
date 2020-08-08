@@ -1,5 +1,6 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.cli;
 
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import org.apache.commons.cli.Options;
 
 import java.io.File;

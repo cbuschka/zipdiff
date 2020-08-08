@@ -1,5 +1,10 @@
 package com.github.cbuschka.zipdiff;
 
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffer;
+import com.github.cbuschka.zipdiff.index.ZipIndex;
+import com.github.cbuschka.zipdiff.index.ZipIndexReader;
 import org.junit.Rule;
 import org.junit.Test;
 

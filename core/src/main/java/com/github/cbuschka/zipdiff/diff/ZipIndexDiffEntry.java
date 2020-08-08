@@ -1,4 +1,6 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.diff;
+
+import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
 public class ZipIndexDiffEntry
 {

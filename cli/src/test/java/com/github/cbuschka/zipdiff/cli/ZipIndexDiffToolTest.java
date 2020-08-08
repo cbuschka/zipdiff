@@ -1,5 +1,7 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.cli;
 
+import com.github.cbuschka.zipdiff.TestZipFile;
+import com.github.cbuschka.zipdiff.cli.ZipDiffTool;
 import org.apache.commons.cli.ParseException;
 import org.junit.Rule;
 import org.junit.Test;

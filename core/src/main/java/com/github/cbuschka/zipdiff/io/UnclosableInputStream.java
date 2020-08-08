@@ -1,4 +1,4 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.io;
 
 import java.io.FilterInputStream;
 import java.io.IOException;

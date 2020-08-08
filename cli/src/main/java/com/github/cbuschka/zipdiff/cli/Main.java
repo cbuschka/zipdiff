@@ -1,4 +1,4 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.cli;
 
 import org.apache.commons.cli.ParseException;
 

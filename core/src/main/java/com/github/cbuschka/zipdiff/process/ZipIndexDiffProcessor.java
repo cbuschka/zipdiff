@@ -1,5 +1,10 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.process;
 
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntry;
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffHandler;
+import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.algorithm.DiffAlgorithmListener;
 import com.github.difflib.algorithm.DiffException;

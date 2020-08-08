@@ -1,5 +1,8 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.index;
 
+import com.github.cbuschka.zipdiff.ZipIndexDumper;
+import com.github.cbuschka.zipdiff.index.ZipIndex;
+import com.github.cbuschka.zipdiff.index.ZipIndexReader;
 import org.junit.Test;
 
 import java.io.IOException;

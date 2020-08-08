@@ -1,5 +1,8 @@
 package com.github.cbuschka.zipdiff;
 
+import com.github.cbuschka.zipdiff.index.ZipIndex;
+import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
+
 import java.io.IOException;
 import java.io.Writer;
 

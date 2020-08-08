@@ -1,5 +1,6 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.maven_plugin;
 
+import com.github.cbuschka.zipdiff.io.StringOut;
 import org.apache.maven.plugin.logging.Log;
 
 import java.io.IOException;

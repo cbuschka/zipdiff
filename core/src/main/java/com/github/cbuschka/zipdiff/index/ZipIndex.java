@@ -1,4 +1,4 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.index;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

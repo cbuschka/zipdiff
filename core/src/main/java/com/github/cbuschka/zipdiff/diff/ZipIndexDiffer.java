@@ -1,4 +1,7 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.diff;
+
+import com.github.cbuschka.zipdiff.index.ZipIndex;
+import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
 import java.math.BigInteger;
 import java.util.HashSet;

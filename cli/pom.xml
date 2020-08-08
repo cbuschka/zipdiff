@@ -18,7 +18,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.github.cbuschka.zipdiff.Main</mainClass>
+                            <mainClass>com.github.cbuschka.zipdiff.cli.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

@@ -1,4 +1,4 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.index;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
