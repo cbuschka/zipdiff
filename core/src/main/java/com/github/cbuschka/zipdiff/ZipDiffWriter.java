@@ -1,9 +1,150 @@
 package com.github.cbuschka.zipdiff;
 
-import java.io.Closeable;
-import java.io.IOException;
+import com.github.difflib.DiffUtils;
+import com.github.difflib.algorithm.DiffAlgorithmListener;
+import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.Patch;
+import com.j256.simplemagic.ContentInfo;
+import com.j256.simplemagic.ContentInfoUtil;
+import org.apache.commons.io.IOUtils;
 
-public interface ZipDiffWriter extends Closeable
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+public class ZipDiffWriter implements AutoCloseable
 {
-	void write(ZipIndexDiff diff) throws IOException;
+	private ContentInfoUtil contentInfoUtil = new ContentInfoUtil();
+	private StringOut stringOut;
+	private boolean showDiffs;
+
+	public ZipDiffWriter(StringOut stringOut, boolean showDiffs)
+	{
+		this.showDiffs = showDiffs;
+		this.stringOut = stringOut;
+	}
+
+	public void write(ZipIndexDiff diff) throws IOException
+	{
+		for (ZipIndexDiffEntry entry : diff.getEntries())
+		{
+			ZipIndexDiffEntryType entryType = entry.getType();
+			switch (entryType)
+			{
+				case ADDED:
+					this.write(entryType, entry.getOtherZipIndexEntry().getFullyQualifiedPath());
+					break;
+				case DELETED:
+					this.write(entryType, entry.getZipIndexEntry().getFullyQualifiedPath());
+					break;
+				case UNCHANGED:
+					this.write(entryType, entry.getZipIndexEntry().getFullyQualifiedPath());
+					break;
+				case RENAMED:
+					this.write(entryType, entry.getZipIndexEntry().getFullyQualifiedPath(), entry.getOtherZipIndexEntry().getFullyQualifiedPath());
+					break;
+				case MODIFIED:
+					writeModified(entryType, entry.getZipIndexEntry(), entry.getOtherZipIndexEntry());
+					break;
+				default:
+					throw new IllegalStateException("Unexpected entry type: " + entryType);
+			}
+		}
+	}
+
+	private void write(ZipIndexDiffEntryType entryType, String path) throws IOException
+	{
+		String s = String.format("%s: %s\n", entryType.name(), path);
+		this.stringOut.write(s);
+	}
+
+	private void write(ZipIndexDiffEntryType entryType, String pathA, String pathB) throws IOException
+	{
+		String s = String.format("%s: %s %s\n", entryType.name(), pathA, pathB);
+		this.stringOut.write(s);
+	}
+
+	private void writeModified(ZipIndexDiffEntryType entryType, ZipIndexEntry entry, ZipIndexEntry other) throws IOException
+	{
+		if (this.showDiffs && canDiff(entry, other))
+		{
+			try
+			{
+				String aText = IOUtils.toString(entry.getDataStream(), StandardCharsets.UTF_8);
+				String bText = IOUtils.toString(other.getDataStream(), StandardCharsets.UTF_8);
+				Patch<String> patch = DiffUtils.diff(aText, bText, (DiffAlgorithmListener) null);
+				final String DIFF_S_S = "DIFF: %s%s\n";
+				for (AbstractDelta<String> delta : patch.getDeltas())
+				{
+					switch (delta.getType())
+					{
+						case INSERT:
+							for (String line : delta.getTarget().getLines())
+							{
+								this.stringOut.write(String.format(DIFF_S_S, "+", line.trim()));
+							}
+							break;
+						case DELETE:
+							for (String line : delta.getSource().getLines())
+							{
+								this.stringOut.write(String.format(DIFF_S_S, "-", line.trim()));
+							}
+							break;
+						case EQUAL:
+							for (String line : delta.getSource().getLines())
+							{
+								this.stringOut.write(String.format(DIFF_S_S, " ", line.trim()));
+							}
+							break;
+						case CHANGE:
+							for (String line : delta.getSource().getLines())
+							{
+								this.stringOut.write(String.format(DIFF_S_S, "-", line.trim()));
+							}
+							for (String line : delta.getTarget().getLines())
+							{
+								this.stringOut.write(String.format(DIFF_S_S, "+", line.trim()));
+							}
+							break;
+						default:
+							throw new IllegalStateException();
+					}
+				}
+			}
+			catch (DiffException ex)
+			{
+				throw new RuntimeException(ex);
+			}
+		}
+		else
+		{
+			String s = String.format("%s: %s %s\n", entryType.name(), entry.getFullyQualifiedPath(), other.getFullyQualifiedPath());
+			this.stringOut.write(s);
+		}
+	}
+
+	private static final String[] SUFFIXES = {"/MANIFEST.MF", ".txt", ".properties", ".xml", ".xsd", ".yml", ".yaml",
+			".json", "*.java"};
+
+	private boolean canDiff(ZipIndexEntry entry, ZipIndexEntry other) throws IOException
+	{
+		for (String suffix : SUFFIXES)
+		{
+			if (entry.getPath().endsWith(suffix))
+			{
+				return true;
+			}
+		}
+
+		ContentInfo aContentInfo = contentInfoUtil.findMatch(entry.getDataStream());
+		ContentInfo bContentInfo = contentInfoUtil.findMatch(other.getDataStream());
+		return aContentInfo != null && bContentInfo != null
+				&& aContentInfo.getMimeType().equals(bContentInfo.getMimeType())
+				&& aContentInfo.getMimeType().startsWith("text/");
+	}
+
+	public void close() throws IOException
+	{
+		this.stringOut.close();
+	}
 }
