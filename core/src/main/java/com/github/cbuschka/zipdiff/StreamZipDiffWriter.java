@@ -19,11 +19,11 @@ public class StreamZipDiffWriter implements ZipDiffWriter
 {
 	private ContentInfoUtil contentInfoUtil = new ContentInfoUtil();
 	private Writer wr;
-	private ZipDiffToolArgs toolArgs;
+	private boolean showDiffs;
 
-	public StreamZipDiffWriter(ZipDiffToolArgs toolArgs)
+	public StreamZipDiffWriter(boolean showDiffs)
 	{
-		this.toolArgs = toolArgs;
+		this.showDiffs = showDiffs;
 		this.wr = new OutputStreamWriter(System.out, Charset.defaultCharset());
 	}
 
@@ -69,7 +69,7 @@ public class StreamZipDiffWriter implements ZipDiffWriter
 
 	private void writeModified(ZipIndexDiffEntryType entryType, ZipIndexEntry entry, ZipIndexEntry other) throws IOException
 	{
-		if (this.toolArgs.isShowDiffs() && canDiff(entry, other))
+		if (this.showDiffs && canDiff(entry, other))
 		{
 			try
 			{
