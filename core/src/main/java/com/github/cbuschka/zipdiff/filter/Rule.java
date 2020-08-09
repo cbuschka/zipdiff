@@ -1,6 +1,7 @@
 package com.github.cbuschka.zipdiff.filter;
 
-import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntry;
+import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
+import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
 public class Rule
 {
@@ -34,9 +35,9 @@ public class Rule
 		return match;
 	}
 
-	public boolean matches(ZipIndexDiffEntry zipIndexDiffEntry)
+	public boolean matches(ZipIndexDiffEntryType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		return this.match != null && this.match.matches(zipIndexDiffEntry);
+		return this.match != null && this.match.matches(type, zipIndexEntry, otherZipIndexEntry);
 	}
 
 	public void setId(String id)

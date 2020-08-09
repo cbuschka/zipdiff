@@ -6,14 +6,12 @@ import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
 import java.util.List;
 
-public class ZipIndexDiffFilter implements ZipIndexDiffHandler
+public abstract class AbstractZipIndexDiffFilter implements ZipIndexDiffHandler
 {
-	private Config config;
-	private ZipIndexDiffHandler handler;
+	protected ZipIndexDiffHandler handler;
 
-	public ZipIndexDiffFilter(Config config, ZipIndexDiffHandler handler)
+	protected AbstractZipIndexDiffFilter(ZipIndexDiffHandler handler)
 	{
-		this.config = config;
 		this.handler = handler;
 	}
 

@@ -22,20 +22,36 @@
                     <quiet>false</quiet>
                     <rules>
                         <rule>
-                            <id>rule1</id>
+                            <id>ignore-dirs</id>
                             <match>
                                 <old>
                                     <includes>
-                                        <include>**/*</include>
+                                        <include>**/</include>
                                     </includes>
                                 </old>
                                 <new>
                                     <includes>
-                                        <include>**/*</include>
+                                        <include>**/</include>
+                                    </includes>
+                                </new>
+                            </match>
+                            <action>IGNORE</action>
+                        </rule>
+                        <rule>
+                            <id>ignore-unchanged-classes</id>
+                            <match>
+                                <old>
+                                    <includes>
+                                        <include>**/*.class</include>
+                                    </includes>
+                                </old>
+                                <new>
+                                    <includes>
+                                        <include>**/*.class</include>
                                     </includes>
                                 </new>
                                 <types>
-                                    <type>ADDED</type>
+                                    <type>UNCHANGED</type>
                                 </types>
                             </match>
                             <action>IGNORE</action>

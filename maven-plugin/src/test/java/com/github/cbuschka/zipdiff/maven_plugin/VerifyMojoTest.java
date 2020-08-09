@@ -14,12 +14,11 @@ public class VerifyMojoTest
 {
 	@Rule
 	public TestResources resources = new TestResources();
-
 	@Rule
 	public MojoRule rule = new MojoRule();
 
 	@Test
-	public void testExecute() throws Exception
+	public void testLoad() throws Exception
 	{
 		File project = resources.getBasedir("basic");
 		File pom = new File(project, "pom.xml");
@@ -28,7 +27,5 @@ public class VerifyMojoTest
 
 		VerifyMojo mojo = (VerifyMojo) rule.lookupMojo("verify", pom);
 		assertNotNull(mojo);
-
-		mojo.execute();
 	}
 }

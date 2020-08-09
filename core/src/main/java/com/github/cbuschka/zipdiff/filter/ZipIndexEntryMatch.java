@@ -2,14 +2,14 @@ package com.github.cbuschka.zipdiff.filter;
 
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class ZipIndexEntryMatch
 {
-	private List<String> includes;
+	private List<String> includes = new ArrayList<>();
 
-	private List<String> excludes;
+	private List<String> excludes = new ArrayList<>();
 
 	public List<String> getIncludes()
 	{
@@ -33,8 +33,9 @@ public class ZipIndexEntryMatch
 
 	public boolean matches(ZipIndexEntry zipIndexEntry)
 	{
-		boolean included = included(zipIndexEntry.getFullyQualifiedPath());
-		return included && !excluded(zipIndexEntry.getFullyQualifiedPath());
+		String path = zipIndexEntry.getFullyQualifiedPath();
+		boolean included = included(path);
+		return included && !excluded(path);
 	}
 
 	private boolean included(String path)
@@ -46,7 +47,7 @@ public class ZipIndexEntryMatch
 
 		for (String include : this.includes)
 		{
-			if (Pattern.matches(include, path))
+			if (PathPattern.matches(include, path))
 			{
 				return true;
 			}
@@ -54,7 +55,6 @@ public class ZipIndexEntryMatch
 
 		return false;
 	}
-
 
 	private boolean excluded(String path)
 	{
@@ -65,7 +65,7 @@ public class ZipIndexEntryMatch
 
 		for (String exclude : this.excludes)
 		{
-			if (Pattern.matches(exclude, path))
+			if (PathPattern.matches(exclude, path))
 			{
 				return true;
 			}

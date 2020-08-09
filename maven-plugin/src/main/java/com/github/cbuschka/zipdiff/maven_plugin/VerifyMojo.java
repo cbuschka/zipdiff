@@ -3,25 +3,29 @@ package com.github.cbuschka.zipdiff.maven_plugin;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffer;
 import com.github.cbuschka.zipdiff.filter.Config;
+import com.github.cbuschka.zipdiff.filter.DiffRegisteringZipIndexDiffFilter;
 import com.github.cbuschka.zipdiff.filter.Rule;
-import com.github.cbuschka.zipdiff.filter.ZipIndexDiffFilter;
+import com.github.cbuschka.zipdiff.filter.RuleBasedZipIndexDiffFilter;
 import com.github.cbuschka.zipdiff.index.ZipIndex;
 import com.github.cbuschka.zipdiff.index.ZipIndexReader;
 import com.github.cbuschka.zipdiff.io.NullStringOut;
 import com.github.cbuschka.zipdiff.process.ZipIndexDiffProcessor;
 import com.github.cbuschka.zipdiff.report.ZipIndexDiffWriter;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mojo(name = "verify")
+@Mojo(name = "verify", requiresProject = true)
 public class VerifyMojo extends AbstractMojo
 {
 	@Parameter(property = "old", required = true)
@@ -32,35 +36,46 @@ public class VerifyMojo extends AbstractMojo
 	private boolean recurse = true;
 	@Parameter(property = "quiet")
 	private boolean quiet = false;
+	@Parameter(property = "failIfDiffsPresent", defaultValue = "true")
+	private boolean failIfDiffsPresent = true;
 	@Parameter
 	private List<Rule> rules = new ArrayList<>();
+	@Parameter(defaultValue = "${session}", required = true, readonly = true)
+	private MavenSession session;
 
 	public void execute() throws MojoExecutionException
 	{
+		PluginParameterExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(session);
 		try
 		{
 			Log log = getLog();
 			log.info("Verifying...");
-			log.info(String.format("Old: %s", old.getAbsolutePath()));
-			log.info(String.format("New: %s", new_.getAbsolutePath()));
+			log.info(String.format("Old: %s", expressionEvaluator.evaluate(old.getAbsolutePath(), String.class)));
+			log.info(String.format("New: %s", expressionEvaluator.evaluate(new_.getAbsolutePath(), String.class)));
 
 			ZipIndexDiff zipIndexDiff = diff();
-			process(zipIndexDiff);
+			boolean diffsPresent = process(zipIndexDiff);
+			if (diffsPresent && failIfDiffsPresent)
+			{
+				throw new MojoExecutionException("There are diffs present. Failing.");
+			}
 		}
-		catch (IOException ex)
+		catch (IOException | ExpressionEvaluationException ex)
 		{
 			throw new MojoExecutionException("Failed to verify.", ex);
 		}
 	}
 
-	private void process(ZipIndexDiff zipIndexDiff) throws IOException
+	private boolean process(ZipIndexDiff zipIndexDiff) throws IOException
 	{
 		ZipIndexDiffWriter writer = new ZipIndexDiffWriter(this.quiet ? new NullStringOut() : new MavenStringOut(getLog()));
+		DiffRegisteringZipIndexDiffFilter diffRegisteringFilter = new DiffRegisteringZipIndexDiffFilter(writer);
 		Config config = new Config();
 		config.setRules(this.rules);
-		ZipIndexDiffFilter filter = new ZipIndexDiffFilter(config, writer);
-		ZipIndexDiffProcessor diffProcessor = new ZipIndexDiffProcessor(filter, true);
+		RuleBasedZipIndexDiffFilter rulesBasedFilter = new RuleBasedZipIndexDiffFilter(config, diffRegisteringFilter);
+		ZipIndexDiffProcessor diffProcessor = new ZipIndexDiffProcessor(rulesBasedFilter, true);
 		diffProcessor.process(zipIndexDiff);
+		return diffRegisteringFilter.isDiffPresent();
 	}
 
 	private ZipIndexDiff diff() throws IOException
