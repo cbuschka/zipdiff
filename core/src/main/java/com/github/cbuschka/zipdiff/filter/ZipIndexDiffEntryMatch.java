@@ -35,7 +35,7 @@ public class ZipIndexDiffEntryMatch
 
 	public boolean matches(ZipIndexDiffEntryType zipIndexDiffEntryType, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		if (this.types != null && !this.types.contains(zipIndexDiffEntryType))
+		if (this.types != null && !this.types.isEmpty() && !this.types.contains(zipIndexDiffEntryType))
 		{
 			return false;
 		}

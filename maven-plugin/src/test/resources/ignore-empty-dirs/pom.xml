@@ -3,21 +3,24 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>any</groupId>
-    <artifactId>any</artifactId>
+    <groupId>com.github.cbuschka.zipdiff</groupId>
+    <artifactId>zipdiff-maven-plugin-it-pom</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <build>
         <plugins>
             <plugin>
                 <groupId>com.github.cbuschka.zipdiff</groupId>
                 <artifactId>zipdiff-maven-plugin</artifactId>
+                <version>${PLUGIN_VERSION}</version>
                 <goals>
                     <goal>verify</goal>
                 </goals>
                 <configuration>
-                    <old>../cli/src/test/resources/a.zip</old>
-                    <new>../cli/src/test/resources/b.zip</new>
+                    <old>${project.basedir}/NoaBatchFrameworkIntegration.ear-61c9a1e1</old>
+                    <new>
+                        ${project.baseir}/NoaBatchFrameworkIntegration/target/NoaBatchFrameworkIntegration-1.0-SNAPSHOT.jar
+                    </new>
                     <recurse>true</recurse>
                     <quiet>false</quiet>
                     <rules>

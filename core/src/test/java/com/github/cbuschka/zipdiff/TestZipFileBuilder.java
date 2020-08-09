@@ -22,6 +22,16 @@ public class TestZipFileBuilder
 	{
 	}
 
+	public TestZipFileBuilder withEntry(String path)
+	{
+		if (!path.endsWith("/"))
+		{
+			path = path + "/";
+		}
+		this.entries.add(new Entry(path, null));
+		return this;
+	}
+
 	public TestZipFileBuilder withEntry(String path, byte[] data)
 	{
 		this.entries.add(new Entry(path, data));
@@ -58,7 +68,10 @@ public class TestZipFileBuilder
 			for (Entry e : this.entries)
 			{
 				zipOut.putNextEntry(new ZipEntry(e.path));
-				zipOut.write(e.data);
+				if (e.data != null)
+				{
+					zipOut.write(e.data);
+				}
 				zipOut.closeEntry();
 			}
 		}

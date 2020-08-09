@@ -56,9 +56,20 @@ public class VerifyMojo extends AbstractMojo
 
 			ZipIndexDiff zipIndexDiff = diff();
 			boolean diffsPresent = process(zipIndexDiff);
-			if (diffsPresent && failIfDiffsPresent)
+			if (diffsPresent)
 			{
-				throw new MojoExecutionException("There are diffs present. Failing.");
+				if (failIfDiffsPresent)
+				{
+					throw new MojoExecutionException("There are diffs present. Failing.");
+				}
+				else
+				{
+					log.warn("There are diffs present.");
+				}
+			}
+			else
+			{
+				log.info("OK, no diffs found.");
 			}
 		}
 		catch (IOException | ExpressionEvaluationException ex)

@@ -2,7 +2,7 @@ language: java
 jdk:
   - openjdk8
 sudo: false
-script: mvn clean install
+script: mvn clean install && mvn verify -PintegrationTests
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 cache:

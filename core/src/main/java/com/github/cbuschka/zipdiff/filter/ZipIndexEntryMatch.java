@@ -34,6 +34,11 @@ public class ZipIndexEntryMatch
 	public boolean matches(ZipIndexEntry zipIndexEntry)
 	{
 		String path = zipIndexEntry.getFullyQualifiedPath();
+		return matches(path);
+	}
+
+	public boolean matches(String path)
+	{
 		boolean included = included(path);
 		return included && !excluded(path);
 	}

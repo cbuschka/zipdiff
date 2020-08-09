@@ -4,11 +4,16 @@ import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffHandler;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 {
+	private static Logger logger = LoggerFactory.getLogger(RuleBasedZipIndexDiffFilter.class);
+
 	private Config config;
 	private Boolean forwardModifiedContent;
 
@@ -134,15 +139,14 @@ public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 
 	private boolean shouldBeForwarded(ZipIndexDiffEntryType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		for (Rule rule : this.config.getRules())
+		Optional<Rule> optRule = this.config.getFirstMatchingRule(type, zipIndexEntry, otherZipIndexEntry);
+		boolean shouldBeForwarded = optRule.map(Rule::getAction).orElse(this.config.getDefaultAction()) == Action.PROCESS;
+		if (logger.isTraceEnabled())
 		{
-			if (rule.matches(type, zipIndexEntry, otherZipIndexEntry))
-			{
-				return rule.getAction() == Action.PROCESS;
-			}
+			logger.trace("type={} old={} new={} => forward={}", type, zipIndexEntry != null ? zipIndexEntry.getFullyQualifiedPath() : "",
+					otherZipIndexEntry != null ? otherZipIndexEntry.getFullyQualifiedPath() : "", shouldBeForwarded);
 		}
-
-		return this.config.getDefaultAction() == Action.PROCESS;
+		return shouldBeForwarded;
 	}
 
 }
