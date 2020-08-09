@@ -16,6 +16,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
@@ -25,7 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mojo(name = "verify", requiresProject = true)
+@Mojo(name = "verify", defaultPhase = LifecyclePhase.VERIFY, requiresProject = true)
 public class VerifyMojo extends AbstractMojo
 {
 	@Parameter(property = "old", required = true)
