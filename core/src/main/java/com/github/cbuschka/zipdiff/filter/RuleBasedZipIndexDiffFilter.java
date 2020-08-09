@@ -28,8 +28,8 @@ public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 	@Override
 	public void begin(ZipIndexDiff zipIndexDiff)
 	{
-		logger.info("Rule(s): {}", this.config.getRules().stream().map(Rule::getId).collect(toList()));
-		logger.info("Default action: {}", this.config.getDefaultAction());
+		logger.debug("Rule(s): {}", this.config.getRules().stream().map(Rule::getId).collect(toList()));
+		logger.debug("Default action: {}", this.config.getDefaultAction());
 
 		handler.begin(zipIndexDiff);
 	}

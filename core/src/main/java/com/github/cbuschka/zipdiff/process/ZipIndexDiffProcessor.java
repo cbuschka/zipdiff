@@ -56,7 +56,7 @@ public class ZipIndexDiffProcessor
 
 	private void handleModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		Optional<ContentDiffer> optContentDiffer = ContentDifferProvider.get(zipIndexEntry, otherZipIndexEntry);
+		Optional<ContentDiffer> optContentDiffer = ContentDifferProvider.getContentDifferFor(zipIndexEntry, otherZipIndexEntry);
 		if (this.showDiffs && optContentDiffer.isPresent())
 		{
 			ContentDiffer contentDiffer = optContentDiffer.get();

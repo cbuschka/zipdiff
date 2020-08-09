@@ -184,7 +184,7 @@ public class ZipIndexDiffer
 	private void onBFileModifiedByChecksum(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipIndexDiff
 			zipIndexDiff, Set<ZipIndexEntry> alreadyProcessedSet)
 	{
-		Optional<ContentDiffer> optContentDiffer = ContentDifferProvider.get(aEntry, bEntry);
+		Optional<ContentDiffer> optContentDiffer = ContentDifferProvider.getContentDifferFor(aEntry, bEntry);
 		if (optContentDiffer.isPresent())
 		{
 			ContentDiffer contentDiffer = optContentDiffer.get();

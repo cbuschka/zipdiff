@@ -1,20 +1,43 @@
 package com.github.cbuschka.zipdiff.content_diff;
 
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.ServiceLoader;
 
-public abstract class ContentDifferProvider
+public class ContentDifferProvider
 {
-	private static List<ContentDiffer> differs = Arrays.asList(
-			new ManifestContentDiffer(),
-			new PropertiesContentDiffer(),
-			new TextContentDiffer()
-	);
+	private static Logger logger = LoggerFactory.getLogger(ContentDifferProvider.class);
 
-	public static Optional<ContentDiffer> get(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	private static List<ContentDiffer> differs = loadContentDiffers();
+
+	private static List<ContentDiffer> loadContentDiffers()
+	{
+		List<ContentDiffer> differs = new ArrayList<>();
+
+		ServiceLoader<ContentDiffer> loader = ServiceLoader.load(ContentDiffer.class);
+		for (ContentDiffer curr : loader)
+		{
+			differs.add(curr);
+		}
+
+		differs.addAll(Arrays.asList(
+				new ManifestContentDiffer(),
+				new PropertiesContentDiffer(),
+				new TextContentDiffer()
+		));
+
+		logger.debug("Current content differs: {}", differs);
+
+		return differs;
+	}
+
+	public static Optional<ContentDiffer> getContentDifferFor(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
 		for (ContentDiffer differ : differs)
 		{
@@ -25,5 +48,9 @@ public abstract class ContentDifferProvider
 		}
 
 		return Optional.empty();
+	}
+
+	private ContentDifferProvider()
+	{
 	}
 }
