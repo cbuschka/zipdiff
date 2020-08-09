@@ -1,5 +1,6 @@
 package com.github.cbuschka.zipdiff.filter;
 
+import com.github.cbuschka.zipdiff.content_diff.ContentDiffType;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 

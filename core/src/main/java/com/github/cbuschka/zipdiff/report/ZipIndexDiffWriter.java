@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ZipIndexDiffWriter implements ZipIndexDiffHandler
 {
-	private static final String DIFF_S_S = "DIFF: %s%s\n";
+	private static final String DIFF_S_S = "  DIFF: %s%s\n";
 
 	private StringOut stringOut;
 
@@ -97,18 +97,18 @@ public class ZipIndexDiffWriter implements ZipIndexDiffHandler
 	}
 
 
-
 	@Override
 	public void startContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
+		write(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry.getFullyQualifiedPath());
 	}
 
 	@Override
-	public void endContentModified()
+	public void endContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
 	}
 
-	public void modifiedContentInserted(List<String> targetLines)
+	public void contentAdded(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, List<String> targetLines)
 	{
 		try
 		{
@@ -124,7 +124,7 @@ public class ZipIndexDiffWriter implements ZipIndexDiffHandler
 
 	}
 
-	public void modifiedContentDeleted(List<String> sourceLines)
+	public void contentDeleted(ZipIndexEntry zipIndexEntry, List<String> sourceLines, ZipIndexEntry otherZipIndexEntry)
 	{
 		try
 		{
@@ -141,28 +141,25 @@ public class ZipIndexDiffWriter implements ZipIndexDiffHandler
 	}
 
 
-	public void modifiedContentEqual(List<String> sourceLines)
+	public void contentUnchanged(ZipIndexEntry zipIndexEntry, List<String> sourceLines, ZipIndexEntry otherZipIndexEntry)
 	{
 		try
 		{
 			for (String line : sourceLines)
 			{
-				this.stringOut.write(String.format(DIFF_S_S, " ", line.trim()));
+				this.stringOut.write(String.format(DIFF_S_S, "=", line.trim()));
 			}
 		}
 		catch (IOException ex)
 		{
 			throw new UndeclaredThrowableException(ex);
 		}
-
 	}
 
-	public void modifiedContentChanged(List<String> sourceLines, List<String> targetLines)
+	public void contentModified(ZipIndexEntry zipIndexEntry, List<String> sourceLines, ZipIndexEntry otherZipIndexEntry, List<String> targetLines)
 	{
 		try
 		{
-
-
 			for (String line : sourceLines)
 			{
 				this.stringOut.write(String.format(DIFF_S_S, "-", line.trim()));
@@ -176,7 +173,5 @@ public class ZipIndexDiffWriter implements ZipIndexDiffHandler
 		{
 			throw new UndeclaredThrowableException(ex);
 		}
-
 	}
-
 }

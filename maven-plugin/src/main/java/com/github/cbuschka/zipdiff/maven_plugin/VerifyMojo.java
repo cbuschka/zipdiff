@@ -29,6 +29,8 @@ import java.util.List;
 @Mojo(name = "verify", defaultPhase = LifecyclePhase.VERIFY, requiresProject = true)
 public class VerifyMojo extends AbstractMojo
 {
+	@Parameter(property = "skip", defaultValue = "false")
+	private boolean skip;
 	@Parameter(property = "old", required = true)
 	private File old;
 	@Parameter(name = "new", property = "new", required = true)
@@ -39,6 +41,8 @@ public class VerifyMojo extends AbstractMojo
 	private boolean quiet = false;
 	@Parameter(property = "failIfDiffsPresent", defaultValue = "true")
 	private boolean failIfDiffsPresent = true;
+	@Parameter(property = "diffContents", defaultValue = "true")
+	private boolean diffContents;
 	@Parameter
 	private List<Rule> rules = new ArrayList<>();
 	@Parameter(defaultValue = "${session}", required = true, readonly = true)
@@ -46,6 +50,11 @@ public class VerifyMojo extends AbstractMojo
 
 	public void execute() throws MojoExecutionException
 	{
+		if (this.skip)
+		{
+			return;
+		}
+
 		PluginParameterExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(session);
 		try
 		{
@@ -55,16 +64,16 @@ public class VerifyMojo extends AbstractMojo
 			log.info(String.format("New: %s", expressionEvaluator.evaluate(new_.getAbsolutePath(), String.class)));
 
 			ZipIndexDiff zipIndexDiff = diff();
-			boolean diffsPresent = process(zipIndexDiff);
-			if (diffsPresent)
+			int diffCount = process(zipIndexDiff);
+			if (diffCount > 0)
 			{
 				if (failIfDiffsPresent)
 				{
-					throw new MojoExecutionException("There are diffs present. Failing.");
+					throw new MojoExecutionException("There are " + diffCount + " diff(s) present. Failing.");
 				}
 				else
 				{
-					log.warn("There are diffs present.");
+					log.warn("There are " + diffCount + " diff(s) present.");
 				}
 			}
 			else
@@ -78,16 +87,16 @@ public class VerifyMojo extends AbstractMojo
 		}
 	}
 
-	private boolean process(ZipIndexDiff zipIndexDiff) throws IOException
+	private int process(ZipIndexDiff zipIndexDiff) throws IOException
 	{
 		ZipIndexDiffWriter writer = new ZipIndexDiffWriter(this.quiet ? new NullStringOut() : new MavenStringOut(getLog()));
 		DiffRegisteringZipIndexDiffFilter diffRegisteringFilter = new DiffRegisteringZipIndexDiffFilter(writer);
 		Config config = new Config();
 		config.setRules(this.rules);
 		RuleBasedZipIndexDiffFilter rulesBasedFilter = new RuleBasedZipIndexDiffFilter(config, diffRegisteringFilter);
-		ZipIndexDiffProcessor diffProcessor = new ZipIndexDiffProcessor(rulesBasedFilter, true);
+		ZipIndexDiffProcessor diffProcessor = new ZipIndexDiffProcessor(rulesBasedFilter, this.diffContents);
 		diffProcessor.process(zipIndexDiff);
-		return diffRegisteringFilter.isDiffPresent();
+		return diffRegisteringFilter.getDiffCount();
 	}
 
 	private ZipIndexDiff diff() throws IOException
@@ -131,15 +140,5 @@ public class VerifyMojo extends AbstractMojo
 	public List<Rule> getRules()
 	{
 		return rules;
-	}
-
-	public boolean isQuiet()
-	{
-		return quiet;
-	}
-
-	public boolean isRecurse()
-	{
-		return recurse;
 	}
 }

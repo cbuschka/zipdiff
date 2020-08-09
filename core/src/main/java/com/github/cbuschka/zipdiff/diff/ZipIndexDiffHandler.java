@@ -20,15 +20,15 @@ public interface ZipIndexDiffHandler
 
 	void startContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry);
 
-	void modifiedContentChanged(List<String> oldLines, List<String> newLines);
+	void contentModified(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry, List<String> newLines);
 
-	void modifiedContentDeleted(List<String> oldLines);
+	void contentDeleted(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry);
 
-	void modifiedContentInserted(List<String> newLines);
+	void contentAdded(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, List<String> newLines);
 
-	void modifiedContentEqual(List<String> oldLines);
+	void contentUnchanged(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry);
 
-	void endContentModified();
+	void endContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry);
 
 	void finished();
 }

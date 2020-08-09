@@ -65,4 +65,16 @@ public class VerifyMojoIntegrationTest
 
 		verifier.verifyErrorFreeLog();
 	}
+
+	@Test
+	public void big() throws Exception
+	{
+		ResourceExtractor.extractResourceToDestination(getClass(), "/big/", this.testDir, true);
+
+		env.put("OLD_FILE", emptyZipFile.getFile().getAbsolutePath());
+		env.put("NEW_FILE", emptyZipFile.getFile().getAbsolutePath());
+		verifier.executeGoal("com.github.cbuschka.zipdiff:zipdiff-maven-plugin:verify", env);
+
+		verifier.verifyErrorFreeLog();
+	}
 }

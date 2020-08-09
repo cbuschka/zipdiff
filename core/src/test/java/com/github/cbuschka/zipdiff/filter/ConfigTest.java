@@ -26,7 +26,7 @@ public class ConfigTest
 	{
 		this.config = new Config();
 		Rule rule = new Rule();
-		rule.getMatch().getOld().setIncludes(Arrays.asList("package/**/*.class"));
+		rule.getMatch().getOld().getPath().setIncludes(Arrays.asList("package/**/*.class"));
 		this.config.getRules().add(rule);
 	}
 

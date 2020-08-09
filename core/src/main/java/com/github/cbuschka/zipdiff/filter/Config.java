@@ -1,9 +1,11 @@
 package com.github.cbuschka.zipdiff.filter;
 
+import com.github.cbuschka.zipdiff.content_diff.ContentDiffType;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,9 +34,22 @@ public class Config
 		this.defaultAction = defaultAction;
 	}
 
-	public Optional<Rule> getFirstMatchingRule(ZipIndexDiffEntryType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry) {
+	public Optional<Rule> getFirstMatchingRule(ZipIndexDiffEntryType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	{
 		List<Rule> matchingRules = getMatchingRules(type, zipIndexEntry, otherZipIndexEntry);
-		if(matchingRules.isEmpty()) {
+		if (matchingRules.isEmpty())
+		{
+			return Optional.empty();
+		}
+
+		return Optional.of(matchingRules.get(0));
+	}
+
+	public Optional<Rule> getFirstMatchingRule(ContentDiffType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	{
+		List<Rule> matchingRules = getMatchingRules(type, zipIndexEntry, otherZipIndexEntry);
+		if (matchingRules.isEmpty())
+		{
 			return Optional.empty();
 		}
 
@@ -53,6 +68,11 @@ public class Config
 		}
 
 		return matchingRules;
+	}
+
+	public List<Rule> getMatchingRules(ContentDiffType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	{
+		return Collections.emptyList();
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.github.cbuschka.zipdiff.filter;
 
+import com.github.cbuschka.zipdiff.content_diff.ContentDiffType;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffHandler;
@@ -10,12 +11,13 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.stream.Collectors.toList;
+
 public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 {
 	private static Logger logger = LoggerFactory.getLogger(RuleBasedZipIndexDiffFilter.class);
 
 	private Config config;
-	private Boolean forwardModifiedContent;
 
 	public RuleBasedZipIndexDiffFilter(Config config, ZipIndexDiffHandler handler)
 	{
@@ -26,6 +28,9 @@ public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 	@Override
 	public void begin(ZipIndexDiff zipIndexDiff)
 	{
+		logger.info("Rule(s): {}", this.config.getRules().stream().map(Rule::getId).collect(toList()));
+		logger.info("Default action: {}", this.config.getDefaultAction());
+
 		handler.begin(zipIndexDiff);
 	}
 
@@ -79,56 +84,57 @@ public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 	{
 		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry))
 		{
-			this.forwardModifiedContent = Boolean.TRUE;
 			super.startContentModified(zipIndexEntry, otherZipIndexEntry);
 		}
-		else
+	}
+
+	@Override
+	public void contentModified(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
+	{
+		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry)
+				&& shouldBeForwarded(ContentDiffType.CONTENT_MODIFIED, zipIndexEntry, otherZipIndexEntry))
 		{
-			this.forwardModifiedContent = Boolean.FALSE;
+			super.contentModified(zipIndexEntry, oldLines, otherZipIndexEntry, newLines);
 		}
 	}
 
 	@Override
-	public void modifiedContentChanged(List<String> oldLines, List<String> newLines)
+	public void contentDeleted(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry)
 	{
-		if (this.forwardModifiedContent)
+		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry)
+				&& shouldBeForwarded(ContentDiffType.CONTENT_DELETED, zipIndexEntry, otherZipIndexEntry))
 		{
-			super.modifiedContentChanged(oldLines, newLines);
+			handler.contentDeleted(zipIndexEntry, oldLines, otherZipIndexEntry);
 		}
 	}
 
 	@Override
-	public void modifiedContentDeleted(List<String> oldLines)
+	public void contentAdded(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
 	{
-		if (this.forwardModifiedContent)
+		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry)
+				&& shouldBeForwarded(ContentDiffType.CONTENT_ADDED, null, otherZipIndexEntry))
 		{
-			handler.modifiedContentDeleted(oldLines);
+			super.contentAdded(zipIndexEntry, otherZipIndexEntry, newLines);
 		}
 	}
 
 	@Override
-	public void modifiedContentInserted(List<String> newLines)
+	public void contentUnchanged(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry)
 	{
-		if (this.forwardModifiedContent)
+		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry)
+				&& shouldBeForwarded(ContentDiffType.CONTENT_UNCHANGED, zipIndexEntry, otherZipIndexEntry))
 		{
-			super.modifiedContentInserted(newLines);
+			super.contentUnchanged(zipIndexEntry, oldLines, otherZipIndexEntry);
 		}
 	}
 
 	@Override
-	public void modifiedContentEqual(List<String> oldLines)
+	public void endContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		if (this.forwardModifiedContent)
+		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry))
 		{
-			super.modifiedContentEqual(oldLines);
+			super.endContentModified(zipIndexEntry, otherZipIndexEntry);
 		}
-	}
-
-	@Override
-	public void endContentModified()
-	{
-		super.endContentModified();
-		this.forwardModifiedContent = null;
 	}
 
 	@Override
@@ -149,4 +155,15 @@ public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 		return shouldBeForwarded;
 	}
 
+	private boolean shouldBeForwarded(ContentDiffType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	{
+		Optional<Rule> optRule = this.config.getFirstMatchingRule(type, zipIndexEntry, otherZipIndexEntry);
+		boolean shouldBeForwarded = optRule.map(Rule::getAction).orElse(this.config.getDefaultAction()) == Action.PROCESS;
+		if (logger.isTraceEnabled())
+		{
+			logger.trace("type={} old={} new={} => forward={}", type, zipIndexEntry != null ? zipIndexEntry.getFullyQualifiedPath() : "",
+					otherZipIndexEntry != null ? otherZipIndexEntry.getFullyQualifiedPath() : "", shouldBeForwarded);
+		}
+		return shouldBeForwarded;
+	}
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class DiffRegisteringZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 {
-	private boolean diffPresent = false;
+	private int diffCount = 0;
 
 	public DiffRegisteringZipIndexDiffFilter(ZipIndexDiffHandler handler)
 	{
@@ -18,21 +18,21 @@ public class DiffRegisteringZipIndexDiffFilter extends AbstractZipIndexDiffFilte
 	@Override
 	public void begin(ZipIndexDiff zipIndexDiff)
 	{
-		this.diffPresent = false;
+		this.diffCount = 0;
 		handler.begin(zipIndexDiff);
 	}
 
 	@Override
 	public void added(ZipIndexEntry otherZipIndexEntry)
 	{
-		this.diffPresent = true;
+		this.diffCount++;
 		super.added(otherZipIndexEntry);
 	}
 
 	@Override
 	public void deleted(ZipIndexEntry zipIndexEntry)
 	{
-		this.diffPresent = true;
+		this.diffCount++;
 		super.deleted(zipIndexEntry);
 	}
 
@@ -45,55 +45,52 @@ public class DiffRegisteringZipIndexDiffFilter extends AbstractZipIndexDiffFilte
 	@Override
 	public void renamed(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		this.diffPresent = true;
+		this.diffCount++;
 		super.renamed(zipIndexEntry, otherZipIndexEntry);
 	}
 
 	@Override
 	public void modified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		this.diffPresent = true;
+		this.diffCount++;
 		super.modified(zipIndexEntry, otherZipIndexEntry);
 	}
 
 	@Override
 	public void startContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		this.diffPresent = true;
+		this.diffCount++;
 		super.startContentModified(zipIndexEntry, otherZipIndexEntry);
 	}
 
 	@Override
-	public void modifiedContentChanged(List<String> oldLines, List<String> newLines)
+	public void contentModified(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
 	{
-		this.diffPresent = true;
-		super.modifiedContentChanged(oldLines, newLines);
+		super.contentModified(zipIndexEntry, oldLines, otherZipIndexEntry, newLines);
 	}
 
 	@Override
-	public void modifiedContentDeleted(List<String> oldLines)
+	public void contentDeleted(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry)
 	{
-		this.diffPresent = true;
-		handler.modifiedContentDeleted(oldLines);
+		handler.contentDeleted(zipIndexEntry, oldLines, otherZipIndexEntry);
 	}
 
 	@Override
-	public void modifiedContentInserted(List<String> newLines)
+	public void contentAdded(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
 	{
-		this.diffPresent = true;
-		super.modifiedContentInserted(newLines);
+		super.contentAdded(zipIndexEntry, otherZipIndexEntry, newLines);
 	}
 
 	@Override
-	public void modifiedContentEqual(List<String> oldLines)
+	public void contentUnchanged(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry)
 	{
-		super.modifiedContentEqual(oldLines);
+		super.contentUnchanged(zipIndexEntry, oldLines, otherZipIndexEntry);
 	}
 
 	@Override
-	public void endContentModified()
+	public void endContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		super.endContentModified();
+		super.endContentModified(zipIndexEntry, otherZipIndexEntry);
 	}
 
 	@Override
@@ -102,8 +99,13 @@ public class DiffRegisteringZipIndexDiffFilter extends AbstractZipIndexDiffFilte
 		super.finished();
 	}
 
+	public int getDiffCount()
+	{
+		return diffCount;
+	}
+
 	public boolean isDiffPresent()
 	{
-		return diffPresent;
+		return this.diffCount > 0;
 	}
 }

@@ -58,33 +58,33 @@ public abstract class AbstractZipIndexDiffFilter implements ZipIndexDiffHandler
 	}
 
 	@Override
-	public void modifiedContentChanged(List<String> oldLines, List<String> newLines)
+	public void contentModified(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
 	{
-		handler.modifiedContentChanged(oldLines, newLines);
+		handler.contentModified(zipIndexEntry, oldLines, otherZipIndexEntry, newLines);
 	}
 
 	@Override
-	public void modifiedContentDeleted(List<String> oldLines)
+	public void contentDeleted(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry)
 	{
-		handler.modifiedContentDeleted(oldLines);
+		handler.contentDeleted(zipIndexEntry, oldLines, otherZipIndexEntry);
 	}
 
 	@Override
-	public void modifiedContentInserted(List<String> newLines)
+	public void contentAdded(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
 	{
-		handler.modifiedContentInserted(newLines);
+		handler.contentAdded(zipIndexEntry, otherZipIndexEntry, newLines);
 	}
 
 	@Override
-	public void modifiedContentEqual(List<String> oldLines)
+	public void contentUnchanged(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry)
 	{
-		handler.modifiedContentEqual(oldLines);
+		handler.contentUnchanged(zipIndexEntry, oldLines, otherZipIndexEntry);
 	}
 
 	@Override
-	public void endContentModified()
+	public void endContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		handler.endContentModified();
+		handler.endContentModified(zipIndexEntry, otherZipIndexEntry);
 	}
 
 	@Override

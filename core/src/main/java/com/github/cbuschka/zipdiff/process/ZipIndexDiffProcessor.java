@@ -1,25 +1,20 @@
 package com.github.cbuschka.zipdiff.process;
 
+import com.github.cbuschka.zipdiff.content_diff.ContentDiff;
+import com.github.cbuschka.zipdiff.content_diff.ContentDiffEntry;
+import com.github.cbuschka.zipdiff.content_diff.ContentDiffer;
+import com.github.cbuschka.zipdiff.content_diff.ContentDifferProvider;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntry;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffHandler;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
-import com.github.difflib.DiffUtils;
-import com.github.difflib.algorithm.DiffAlgorithmListener;
-import com.github.difflib.algorithm.DiffException;
-import com.github.difflib.patch.AbstractDelta;
-import com.github.difflib.patch.Patch;
-import com.j256.simplemagic.ContentInfo;
-import com.j256.simplemagic.ContentInfoUtil;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public class ZipIndexDiffProcessor
 {
-	private ContentInfoUtil contentInfoUtil = new ContentInfoUtil();
 	private ZipIndexDiffHandler handler;
 	private boolean showDiffs;
 
@@ -50,7 +45,7 @@ public class ZipIndexDiffProcessor
 					this.handler.renamed(entry.getZipIndexEntry(), entry.getOtherZipIndexEntry());
 					break;
 				case MODIFIED:
-					handleModified(entryType, entry.getZipIndexEntry(), entry.getOtherZipIndexEntry());
+					handleModified(entry.getZipIndexEntry(), entry.getOtherZipIndexEntry());
 					break;
 				default:
 					throw new IllegalStateException("Unexpected entry type: " + entryType);
@@ -59,66 +54,39 @@ public class ZipIndexDiffProcessor
 		this.handler.finished();
 	}
 
-	private void handleModified(ZipIndexDiffEntryType entryType, ZipIndexEntry entry, ZipIndexEntry other) throws IOException
+	private void handleModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		if (this.showDiffs && canDiff(entry, other))
+		Optional<ContentDiffer> optContentDiffer = ContentDifferProvider.get(zipIndexEntry, otherZipIndexEntry);
+		if (this.showDiffs && optContentDiffer.isPresent())
 		{
-			this.handler.startContentModified(entry, other);
-			try
+			ContentDiffer contentDiffer = optContentDiffer.get();
+			ContentDiff contentDiff = contentDiffer.diff(zipIndexEntry, otherZipIndexEntry);
+			this.handler.startContentModified(zipIndexEntry, otherZipIndexEntry);
+			for (ContentDiffEntry entry : contentDiff.getEntries())
 			{
-				String aText = IOUtils.toString(entry.getDataStream(), StandardCharsets.UTF_8);
-				String bText = IOUtils.toString(other.getDataStream(), StandardCharsets.UTF_8);
-				Patch<String> patch = DiffUtils.diff(aText, bText, (DiffAlgorithmListener) null);
-				for (AbstractDelta<String> delta : patch.getDeltas())
+				switch (entry.getType())
 				{
-					switch (delta.getType())
-					{
-						case INSERT:
-							this.handler.modifiedContentInserted(delta.getTarget().getLines());
-							break;
-						case DELETE:
-							this.handler.modifiedContentDeleted(delta.getSource().getLines());
-							break;
-						case EQUAL:
-							this.handler.modifiedContentEqual(delta.getSource().getLines());
-							break;
-						case CHANGE:
-							this.handler.modifiedContentChanged(delta.getSource().getLines(), delta.getTarget().getLines());
-							break;
-						default:
-							throw new IllegalStateException();
-					}
+					case CONTENT_ADDED:
+						this.handler.contentAdded(zipIndexEntry, otherZipIndexEntry, entry.getNewLines());
+						break;
+					case CONTENT_DELETED:
+						this.handler.contentDeleted(zipIndexEntry, entry.getOldLines(), otherZipIndexEntry);
+						break;
+					case CONTENT_UNCHANGED:
+						this.handler.contentUnchanged(zipIndexEntry, entry.getOldLines(), otherZipIndexEntry);
+						break;
+					case CONTENT_MODIFIED:
+						this.handler.contentModified(zipIndexEntry, entry.getOldLines(), otherZipIndexEntry, entry.getNewLines());
+						break;
+					default:
+						throw new IllegalArgumentException("Unknown content diff type " + entry.getType() + ".");
 				}
-				this.handler.endContentModified();
 			}
-			catch (DiffException ex)
-			{
-				throw new RuntimeException(ex);
-			}
+			this.handler.endContentModified(zipIndexEntry, otherZipIndexEntry);
 		}
 		else
 		{
-			this.handler.modified(entry, other);
+			this.handler.modified(zipIndexEntry, otherZipIndexEntry);
 		}
-	}
-
-	private static final String[] SUFFIXES = {"/MANIFEST.MF", ".txt", ".properties", ".xml", ".xsd", ".yml", ".yaml",
-			".json", "*.java"};
-
-	private boolean canDiff(ZipIndexEntry entry, ZipIndexEntry other) throws IOException
-	{
-		for (String suffix : SUFFIXES)
-		{
-			if (entry.getPath().endsWith(suffix))
-			{
-				return true;
-			}
-		}
-
-		ContentInfo aContentInfo = contentInfoUtil.findMatch(entry.getDataStream());
-		ContentInfo bContentInfo = contentInfoUtil.findMatch(other.getDataStream());
-		return aContentInfo != null && bContentInfo != null
-				&& aContentInfo.getMimeType().equals(bContentInfo.getMimeType())
-				&& aContentInfo.getMimeType().startsWith("text/");
 	}
 }

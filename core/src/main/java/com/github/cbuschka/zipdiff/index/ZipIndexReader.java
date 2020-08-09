@@ -91,7 +91,7 @@ public class ZipIndexReader implements Closeable
 			checksum = this.checksumCalculator.calcChecksum(new ByteArrayInputStream(data));
 		}
 
-		return new ZipIndexEntry(this.location, this.parentPath.isEmpty() ? "" : this.parentPath + "!", entryPath, checksum, entrySize, entryCompressedSize, entryCrc, data, subIndex);
+		return new ZipIndexEntry(this.location, this.parentPath.isEmpty() ? "" : this.parentPath, entryPath, checksum, entrySize, entryCompressedSize, entryCrc, data, subIndex);
 	}
 
 	private ZipIndex readZipIndex(String entryPath, InputStream in) throws IOException

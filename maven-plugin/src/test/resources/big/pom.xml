@@ -23,44 +23,36 @@
                     <quiet>false</quiet>
                     <rules>
                         <rule>
-                            <id>ignore-dirs</id>
+                            <id>rule0</id>
                             <match>
                                 <old>
                                     <path>
                                         <includes>
-                                            <include>**/</include>
+                                            <include>rule0-old-path-include0</include>
+                                            <include>rule0-old-path-include1</include>
                                         </includes>
+                                        <excludes>
+                                            <exclude>rule0-old-path-exclude0</exclude>
+                                            <include>rule0-old-path-exclude1</include>
+                                        </excludes>
                                     </path>
                                 </old>
                                 <new>
                                     <path>
                                         <includes>
-                                            <include>**/</include>
+                                            <include>rule0-new-path-include0</include>
+                                            <include>rule0-new-path-include1</include>
                                         </includes>
-                                    </path>
-                                </new>
-                            </match>
-                            <action>IGNORE</action>
-                        </rule>
-                        <rule>
-                            <id>ignore-unchanged-classes</id>
-                            <match>
-                                <old>
-                                    <path>
-                                        <includes>
-                                            <include>**/*.class</include>
-                                        </includes>
-                                    </path>
-                                </old>
-                                <new>
-                                    <path>
-                                        <includes>
-                                            <include>**/*.class</include>
-                                        </includes>
+                                        <excludes>
+                                            <exclude>rule0-new-path-exclude0</exclude>
+                                            <include>rule0-new-path-exclude1</include>
+                                        </excludes>
                                     </path>
                                 </new>
                                 <types>
+                                    <type>ADDED</type>
                                     <type>UNCHANGED</type>
+                                    <type>MODIFIED</type>
                                 </types>
                             </match>
                             <action>IGNORE</action>

@@ -8,6 +8,9 @@ public class PathPattern
 	{
 		String regex = "^"
 				+ pattern
+				.replace("[", "\\[")
+				.replace("(", "\\(")
+				.replace("{", "\\{")
 				.replaceAll("\\*\\*[/!](.)", "__PATH_DOUBLE_STAR_SLASH__$1")
 				.replace("**", "__PATH_DOUBLE_STAR__")
 				.replace(".", "__PATH_DOT__")
