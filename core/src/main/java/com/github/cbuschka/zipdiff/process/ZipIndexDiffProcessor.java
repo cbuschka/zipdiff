@@ -1,7 +1,6 @@
 package com.github.cbuschka.zipdiff.process;
 
 import com.github.cbuschka.zipdiff.content_diff.ContentDiff;
-import com.github.cbuschka.zipdiff.content_diff.ContentDiffEntry;
 import com.github.cbuschka.zipdiff.content_diff.ContentDiffer;
 import com.github.cbuschka.zipdiff.content_diff.ContentDifferProvider;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
@@ -11,16 +10,13 @@ import com.github.cbuschka.zipdiff.diff.ZipIndexDiffHandler;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
 import java.io.IOException;
-import java.util.Optional;
 
 public class ZipIndexDiffProcessor
 {
 	private ZipIndexDiffHandler handler;
-	private boolean showDiffs;
 
-	public ZipIndexDiffProcessor(ZipIndexDiffHandler handler, boolean showDiffs)
+	public ZipIndexDiffProcessor(ZipIndexDiffHandler handler)
 	{
-		this.showDiffs = showDiffs;
 		this.handler = handler;
 	}
 
@@ -56,37 +52,15 @@ public class ZipIndexDiffProcessor
 
 	private void handleModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		Optional<ContentDiffer> optContentDiffer = ContentDifferProvider.getContentDifferFor(zipIndexEntry, otherZipIndexEntry);
-		if (this.showDiffs && optContentDiffer.isPresent())
+		ContentDiffer contentDiffer = ContentDifferProvider.getContentDifferFor(zipIndexEntry, otherZipIndexEntry);
+		ContentDiff contentDiff = contentDiffer.diff(zipIndexEntry, otherZipIndexEntry);
+		if (contentDiff.hasChanges())
 		{
-			ContentDiffer contentDiffer = optContentDiffer.get();
-			ContentDiff contentDiff = contentDiffer.diff(zipIndexEntry, otherZipIndexEntry);
-			this.handler.startContentModified(zipIndexEntry, otherZipIndexEntry);
-			for (ContentDiffEntry entry : contentDiff.getEntries())
-			{
-				switch (entry.getType())
-				{
-					case CONTENT_ADDED:
-						this.handler.contentAdded(zipIndexEntry, otherZipIndexEntry, entry.getNewLines());
-						break;
-					case CONTENT_DELETED:
-						this.handler.contentDeleted(zipIndexEntry, entry.getOldLines(), otherZipIndexEntry);
-						break;
-					case CONTENT_UNCHANGED:
-						this.handler.contentUnchanged(zipIndexEntry, entry.getOldLines(), otherZipIndexEntry);
-						break;
-					case CONTENT_MODIFIED:
-						this.handler.contentModified(zipIndexEntry, entry.getOldLines(), otherZipIndexEntry, entry.getNewLines());
-						break;
-					default:
-						throw new IllegalArgumentException("Unknown content diff type " + entry.getType() + ".");
-				}
-			}
-			this.handler.endContentModified(zipIndexEntry, otherZipIndexEntry);
+			this.handler.modified(zipIndexEntry, otherZipIndexEntry, contentDiff);
 		}
 		else
 		{
-			this.handler.modified(zipIndexEntry, otherZipIndexEntry);
+			this.handler.unchanged(zipIndexEntry, otherZipIndexEntry);
 		}
 	}
 }

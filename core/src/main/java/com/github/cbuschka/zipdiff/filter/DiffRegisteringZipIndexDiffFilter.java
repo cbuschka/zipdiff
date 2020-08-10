@@ -1,10 +1,9 @@
 package com.github.cbuschka.zipdiff.filter;
 
+import com.github.cbuschka.zipdiff.content_diff.ContentDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffHandler;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
-
-import java.util.List;
 
 public class DiffRegisteringZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 {
@@ -50,47 +49,10 @@ public class DiffRegisteringZipIndexDiffFilter extends AbstractZipIndexDiffFilte
 	}
 
 	@Override
-	public void modified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	public void modified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, ContentDiff contentDiff)
 	{
 		this.diffCount++;
-		super.modified(zipIndexEntry, otherZipIndexEntry);
-	}
-
-	@Override
-	public void startContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
-	{
-		this.diffCount++;
-		super.startContentModified(zipIndexEntry, otherZipIndexEntry);
-	}
-
-	@Override
-	public void contentModified(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
-	{
-		super.contentModified(zipIndexEntry, oldLines, otherZipIndexEntry, newLines);
-	}
-
-	@Override
-	public void contentDeleted(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry)
-	{
-		handler.contentDeleted(zipIndexEntry, oldLines, otherZipIndexEntry);
-	}
-
-	@Override
-	public void contentAdded(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
-	{
-		super.contentAdded(zipIndexEntry, otherZipIndexEntry, newLines);
-	}
-
-	@Override
-	public void contentUnchanged(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry)
-	{
-		super.contentUnchanged(zipIndexEntry, oldLines, otherZipIndexEntry);
-	}
-
-	@Override
-	public void endContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
-	{
-		super.endContentModified(zipIndexEntry, otherZipIndexEntry);
+		super.modified(zipIndexEntry, otherZipIndexEntry, contentDiff);
 	}
 
 	@Override
@@ -102,10 +64,5 @@ public class DiffRegisteringZipIndexDiffFilter extends AbstractZipIndexDiffFilte
 	public int getDiffCount()
 	{
 		return diffCount;
-	}
-
-	public boolean isDiffPresent()
-	{
-		return this.diffCount > 0;
 	}
 }

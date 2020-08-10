@@ -1,14 +1,14 @@
 package com.github.cbuschka.zipdiff.filter;
 
-import com.github.cbuschka.zipdiff.content_diff.ContentDiffType;
-import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
+
+import java.util.List;
 
 public class Rule
 {
 	private String id;
 
-	private ZipIndexDiffEntryMatch match = new ZipIndexDiffEntryMatch();
+	private Match match = new Match();
 
 	private Action action = Action.PROCESS;
 
@@ -21,7 +21,7 @@ public class Rule
 		this.action = action;
 	}
 
-	public void setMatch(ZipIndexDiffEntryMatch match)
+	public void setMatch(Match match)
 	{
 		this.match = match;
 	}
@@ -31,14 +31,14 @@ public class Rule
 		return action;
 	}
 
-	public ZipIndexDiffEntryMatch getMatch()
+	public Match getMatch()
 	{
 		return match;
 	}
 
-	public boolean matches(ZipIndexDiffEntryType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	public boolean matches(DiffType type, ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
 	{
-		return this.match != null && this.match.matches(type, zipIndexEntry, otherZipIndexEntry);
+		return this.match != null && this.match.matches(type, zipIndexEntry, oldLines, otherZipIndexEntry, newLines);
 	}
 
 	public void setId(String id)

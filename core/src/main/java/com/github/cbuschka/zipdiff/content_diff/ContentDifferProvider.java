@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.ServiceLoader;
 
 public class ContentDifferProvider
@@ -15,6 +14,8 @@ public class ContentDifferProvider
 	private static Logger logger = LoggerFactory.getLogger(ContentDifferProvider.class);
 
 	private static List<ContentDiffer> differs = loadContentDiffers();
+
+	private static ContentDiffer defaultDiffer = new DefaultContentDiffer();
 
 	private static List<ContentDiffer> loadContentDiffers()
 	{
@@ -37,17 +38,17 @@ public class ContentDifferProvider
 		return differs;
 	}
 
-	public static Optional<ContentDiffer> getContentDifferFor(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	public static ContentDiffer getContentDifferFor(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
 		for (ContentDiffer differ : differs)
 		{
 			if (differ.handles(zipIndexEntry, otherZipIndexEntry))
 			{
-				return Optional.of(differ);
+				return differ;
 			}
 		}
 
-		return Optional.empty();
+		return defaultDiffer;
 	}
 
 	private ContentDifferProvider()

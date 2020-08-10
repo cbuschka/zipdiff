@@ -2,6 +2,7 @@ package com.github.cbuschka.zipdiff.maven_plugin;
 
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffer;
+import com.github.cbuschka.zipdiff.filter.Action;
 import com.github.cbuschka.zipdiff.filter.Config;
 import com.github.cbuschka.zipdiff.filter.DiffRegisteringZipIndexDiffFilter;
 import com.github.cbuschka.zipdiff.filter.Rule;
@@ -39,6 +40,8 @@ public class VerifyMojo extends AbstractMojo
 	private boolean recurse = true;
 	@Parameter(property = "quiet")
 	private boolean quiet = false;
+	@Parameter(property = "showUnchanged", defaultValue = "true")
+	private boolean showUnchanged = true;
 	@Parameter(property = "failIfDiffsPresent", defaultValue = "true")
 	private boolean failIfDiffsPresent = true;
 	@Parameter(property = "diffContents", defaultValue = "true")
@@ -89,12 +92,13 @@ public class VerifyMojo extends AbstractMojo
 
 	private int process(ZipIndexDiff zipIndexDiff) throws IOException
 	{
-		ZipIndexDiffWriter writer = new ZipIndexDiffWriter(this.quiet ? new NullStringOut() : new MavenStringOut(getLog()));
+		ZipIndexDiffWriter writer = new ZipIndexDiffWriter(this.quiet ? new NullStringOut() : new MavenStringOut(getLog()), this.diffContents, this.showUnchanged);
 		DiffRegisteringZipIndexDiffFilter diffRegisteringFilter = new DiffRegisteringZipIndexDiffFilter(writer);
 		Config config = new Config();
 		config.setRules(this.rules);
+		config.setDefaultAction(Action.PROCESS);
 		RuleBasedZipIndexDiffFilter rulesBasedFilter = new RuleBasedZipIndexDiffFilter(config, diffRegisteringFilter);
-		ZipIndexDiffProcessor diffProcessor = new ZipIndexDiffProcessor(rulesBasedFilter, this.diffContents);
+		ZipIndexDiffProcessor diffProcessor = new ZipIndexDiffProcessor(rulesBasedFilter);
 		diffProcessor.process(zipIndexDiff);
 		return diffRegisteringFilter.getDiffCount();
 	}
@@ -140,5 +144,25 @@ public class VerifyMojo extends AbstractMojo
 	public List<Rule> getRules()
 	{
 		return rules;
+	}
+
+	public void setDiffContents(boolean diffContents)
+	{
+		this.diffContents = diffContents;
+	}
+
+	public boolean isDiffContents()
+	{
+		return diffContents;
+	}
+
+	public boolean isShowUnchanged()
+	{
+		return showUnchanged;
+	}
+
+	public void setShowUnchanged(boolean showUnchanged)
+	{
+		this.showUnchanged = showUnchanged;
 	}
 }

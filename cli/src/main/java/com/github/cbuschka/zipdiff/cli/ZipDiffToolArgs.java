@@ -11,6 +11,7 @@ public class ZipDiffToolArgs
 	private final boolean recurse;
 	private boolean showDiffs;
 	private boolean usageRequested;
+	private boolean showUnchanged;
 	private boolean quiet;
 	private Options options;
 	private File fileA;
@@ -20,7 +21,8 @@ public class ZipDiffToolArgs
 	public ZipDiffToolArgs(Options options, File fileA, File fileB,
 						   Set<ZipIndexDiffEntryType> entryTypes,
 						   boolean quiet, boolean usageRequested,
-						   boolean recurse, boolean showDiffs)
+						   boolean recurse, boolean showDiffs,
+						   boolean showUnchanged)
 	{
 		this.options = options;
 		this.fileA = fileA;
@@ -30,6 +32,7 @@ public class ZipDiffToolArgs
 		this.usageRequested = usageRequested;
 		this.recurse = recurse;
 		this.showDiffs = showDiffs;
+		this.showUnchanged = showUnchanged;
 	}
 
 	public Options getOptions()
@@ -70,5 +73,10 @@ public class ZipDiffToolArgs
 	public boolean isShowDiffs()
 	{
 		return showDiffs;
+	}
+
+	public boolean isShowUnchanged()
+	{
+		return showUnchanged;
 	}
 }

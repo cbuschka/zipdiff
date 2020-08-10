@@ -1,5 +1,7 @@
 package com.github.cbuschka.zipdiff.filter;
 
+import com.github.cbuschka.zipdiff.content_diff.ContentDiff;
+import com.github.cbuschka.zipdiff.content_diff.ContentDiffEntry;
 import com.github.cbuschka.zipdiff.content_diff.ContentDiffType;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
@@ -8,6 +10,7 @@ import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +40,7 @@ public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 	@Override
 	public void added(ZipIndexEntry otherZipIndexEntry)
 	{
-		if (shouldBeForwarded(ZipIndexDiffEntryType.ADDED, null, otherZipIndexEntry))
+		if (shouldBeProcessed(ZipIndexDiffEntryType.ADDED, null, otherZipIndexEntry))
 		{
 			super.added(otherZipIndexEntry);
 		}
@@ -46,7 +49,7 @@ public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 	@Override
 	public void deleted(ZipIndexEntry zipIndexEntry)
 	{
-		if (shouldBeForwarded(ZipIndexDiffEntryType.DELETED, zipIndexEntry, null))
+		if (shouldBeProcessed(ZipIndexDiffEntryType.DELETED, zipIndexEntry, null))
 		{
 			super.deleted(zipIndexEntry);
 		}
@@ -55,7 +58,7 @@ public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 	@Override
 	public void unchanged(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		if (shouldBeForwarded(ZipIndexDiffEntryType.UNCHANGED, zipIndexEntry, otherZipIndexEntry))
+		if (shouldBeProcessed(ZipIndexDiffEntryType.UNCHANGED, zipIndexEntry, otherZipIndexEntry))
 		{
 			super.unchanged(zipIndexEntry, otherZipIndexEntry);
 		}
@@ -64,77 +67,42 @@ public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 	@Override
 	public void renamed(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		if (shouldBeForwarded(ZipIndexDiffEntryType.RENAMED, zipIndexEntry, otherZipIndexEntry))
+		if (shouldBeProcessed(ZipIndexDiffEntryType.RENAMED, zipIndexEntry, otherZipIndexEntry))
 		{
 			super.renamed(zipIndexEntry, otherZipIndexEntry);
 		}
 	}
 
 	@Override
-	public void modified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	public void modified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, ContentDiff contentDiff)
 	{
-		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry))
+		if (shouldBeProcessed(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry))
 		{
-			super.modified(zipIndexEntry, otherZipIndexEntry);
+			super.modified(zipIndexEntry, otherZipIndexEntry, contentDiff);
+			contentDiff = filterContent(zipIndexEntry, otherZipIndexEntry, contentDiff);
+			if (contentDiff.hasChanges())
+			{
+				super.modified(zipIndexEntry, otherZipIndexEntry, contentDiff);
+			}
+			else
+			{
+				super.unchanged(zipIndexEntry, otherZipIndexEntry);
+			}
 		}
 	}
 
-	@Override
-	public void startContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	private ContentDiff filterContent(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, ContentDiff contentDiff)
 	{
-		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry))
+		List<ContentDiffEntry> newEntries = new ArrayList<>();
+		for (ContentDiffEntry entry : contentDiff.getEntries())
 		{
-			super.startContentModified(zipIndexEntry, otherZipIndexEntry);
+			if (shouldBeProcessed(entry.getType(), zipIndexEntry, entry.getOldLines(), otherZipIndexEntry, entry.getNewLines()))
+			{
+				newEntries.add(entry);
+			}
 		}
-	}
 
-	@Override
-	public void contentModified(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
-	{
-		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry)
-				&& shouldBeForwarded(ContentDiffType.CONTENT_MODIFIED, zipIndexEntry, otherZipIndexEntry))
-		{
-			super.contentModified(zipIndexEntry, oldLines, otherZipIndexEntry, newLines);
-		}
-	}
-
-	@Override
-	public void contentDeleted(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry)
-	{
-		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry)
-				&& shouldBeForwarded(ContentDiffType.CONTENT_DELETED, zipIndexEntry, otherZipIndexEntry))
-		{
-			handler.contentDeleted(zipIndexEntry, oldLines, otherZipIndexEntry);
-		}
-	}
-
-	@Override
-	public void contentAdded(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
-	{
-		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry)
-				&& shouldBeForwarded(ContentDiffType.CONTENT_ADDED, null, otherZipIndexEntry))
-		{
-			super.contentAdded(zipIndexEntry, otherZipIndexEntry, newLines);
-		}
-	}
-
-	@Override
-	public void contentUnchanged(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry)
-	{
-		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry)
-				&& shouldBeForwarded(ContentDiffType.CONTENT_UNCHANGED, zipIndexEntry, otherZipIndexEntry))
-		{
-			super.contentUnchanged(zipIndexEntry, oldLines, otherZipIndexEntry);
-		}
-	}
-
-	@Override
-	public void endContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
-	{
-		if (shouldBeForwarded(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry))
-		{
-			super.endContentModified(zipIndexEntry, otherZipIndexEntry);
-		}
+		return new ContentDiff(zipIndexEntry, otherZipIndexEntry, newEntries);
 	}
 
 	@Override
@@ -143,27 +111,22 @@ public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 		super.finished();
 	}
 
-	private boolean shouldBeForwarded(ZipIndexDiffEntryType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	private boolean shouldBeProcessed(ZipIndexDiffEntryType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		Optional<Rule> optRule = this.config.getFirstMatchingRule(type, zipIndexEntry, otherZipIndexEntry);
-		boolean shouldBeForwarded = optRule.map(Rule::getAction).orElse(this.config.getDefaultAction()) == Action.PROCESS;
-		if (logger.isTraceEnabled())
-		{
-			logger.trace("type={} old={} new={} => forward={}", type, zipIndexEntry != null ? zipIndexEntry.getFullyQualifiedPath() : "",
-					otherZipIndexEntry != null ? otherZipIndexEntry.getFullyQualifiedPath() : "", shouldBeForwarded);
-		}
-		return shouldBeForwarded;
+		return shouldBeProcessed(DiffType.instanceFor(type), zipIndexEntry, null, otherZipIndexEntry, null);
 	}
 
-	private boolean shouldBeForwarded(ContentDiffType type, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	private boolean shouldBeProcessed(ContentDiffType type, ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
 	{
-		Optional<Rule> optRule = this.config.getFirstMatchingRule(type, zipIndexEntry, otherZipIndexEntry);
-		boolean shouldBeForwarded = optRule.map(Rule::getAction).orElse(this.config.getDefaultAction()) == Action.PROCESS;
-		if (logger.isTraceEnabled())
-		{
-			logger.trace("type={} old={} new={} => forward={}", type, zipIndexEntry != null ? zipIndexEntry.getFullyQualifiedPath() : "",
-					otherZipIndexEntry != null ? otherZipIndexEntry.getFullyQualifiedPath() : "", shouldBeForwarded);
-		}
-		return shouldBeForwarded;
+		return shouldBeProcessed(DiffType.instanceFor(type), zipIndexEntry, oldLines, otherZipIndexEntry, newLines);
+	}
+
+	private boolean shouldBeProcessed(DiffType type, ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
+	{
+		Optional<Rule> optRule = this.config.getFirstMatchingRule(type, zipIndexEntry, oldLines, otherZipIndexEntry, newLines);
+		boolean shouldBeProcessed = optRule.map(Rule::getAction).orElse(this.config.getDefaultAction()) == Action.PROCESS;
+		logger.trace("type={} old={} new={} => process={}", type, zipIndexEntry != null ? zipIndexEntry.getFullyQualifiedPath() : "",
+				otherZipIndexEntry != null ? otherZipIndexEntry.getFullyQualifiedPath() : "", shouldBeProcessed);
+		return shouldBeProcessed;
 	}
 }

@@ -1,6 +1,8 @@
 package com.github.cbuschka.zipdiff.content_diff;
 
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;

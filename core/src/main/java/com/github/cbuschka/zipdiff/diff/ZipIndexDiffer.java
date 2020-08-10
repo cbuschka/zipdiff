@@ -9,7 +9,6 @@ import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public class ZipIndexDiffer
@@ -184,23 +183,15 @@ public class ZipIndexDiffer
 	private void onBFileModifiedByChecksum(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipIndexDiff
 			zipIndexDiff, Set<ZipIndexEntry> alreadyProcessedSet)
 	{
-		Optional<ContentDiffer> optContentDiffer = ContentDifferProvider.getContentDifferFor(aEntry, bEntry);
-		if (optContentDiffer.isPresent())
+		ContentDiffer contentDiffer = ContentDifferProvider.getContentDifferFor(aEntry, bEntry);
+		ContentDiff contentDiff = contentDiffer.diff(aEntry, bEntry);
+		if (contentDiff.hasChanges())
 		{
-			ContentDiffer contentDiffer = optContentDiffer.get();
-			ContentDiff contentDiff = contentDiffer.diff(aEntry, bEntry);
-			if (contentDiff.hasChanges())
-			{
-				zipIndexDiff.addEntry(new ZipIndexDiffEntry(ZipIndexDiffEntryType.MODIFIED, aEntry, bEntry));
-			}
-			else
-			{
-				zipIndexDiff.addEntry(new ZipIndexDiffEntry(ZipIndexDiffEntryType.UNCHANGED, aEntry, bEntry));
-			}
+			zipIndexDiff.addEntry(new ZipIndexDiffEntry(ZipIndexDiffEntryType.MODIFIED, aEntry, bEntry));
 		}
 		else
 		{
-			zipIndexDiff.addEntry(new ZipIndexDiffEntry(ZipIndexDiffEntryType.MODIFIED, aEntry, bEntry));
+			zipIndexDiff.addEntry(new ZipIndexDiffEntry(ZipIndexDiffEntryType.UNCHANGED, aEntry, bEntry));
 		}
 		alreadyProcessedSet.add(bEntry);
 		alreadyProcessedSet.add(aEntry);

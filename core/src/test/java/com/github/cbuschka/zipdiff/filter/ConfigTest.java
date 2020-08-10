@@ -1,6 +1,5 @@
 package com.github.cbuschka.zipdiff.filter;
 
-import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 import org.junit.Test;
 
@@ -35,7 +34,7 @@ public class ConfigTest
 	{
 		givenConfigIsEmpty();
 
-		Optional<Rule> optRule = config.getFirstMatchingRule(ZipIndexDiffEntryType.DELETED, zipIndexEntry, null);
+		Optional<Rule> optRule = config.getFirstMatchingRule(DiffType.DELETED, zipIndexEntry, null, null, null);
 
 		assertFalse(optRule.isPresent());
 	}
@@ -45,7 +44,7 @@ public class ConfigTest
 	{
 		givenConfigIsEmpty();
 
-		Optional<Rule> optRule = config.getFirstMatchingRule(ZipIndexDiffEntryType.ADDED, null, otherZipIndexEntry);
+		Optional<Rule> optRule = config.getFirstMatchingRule(DiffType.ADDED, null, null, otherZipIndexEntry, null);
 
 		assertFalse(optRule.isPresent());
 	}
@@ -55,7 +54,7 @@ public class ConfigTest
 	{
 		givenConfigHasRuleForZipIndexEntry();
 
-		Optional<Rule> optRule = config.getFirstMatchingRule(ZipIndexDiffEntryType.DELETED, zipIndexEntry, null);
+		Optional<Rule> optRule = config.getFirstMatchingRule(DiffType.DELETED, zipIndexEntry, null, null, null);
 
 		assertTrue(optRule.isPresent());
 	}

@@ -43,6 +43,6 @@ public class ZipDiffToolArgsParser
 
 		return new ZipDiffToolArgs(options, fileA,
 				fileB, EnumSet.allOf(ZipIndexDiffEntryType.class),
-				quiet, usageRequested, recurse, diff);
+				quiet, usageRequested, recurse, diff, true);
 	}
 }

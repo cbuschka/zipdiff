@@ -1,5 +1,7 @@
 package com.github.cbuschka.zipdiff.report;
 
+import com.github.cbuschka.zipdiff.content_diff.ContentDiff;
+import com.github.cbuschka.zipdiff.content_diff.ContentDiffEntry;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffHandler;
@@ -15,10 +17,14 @@ public class ZipIndexDiffWriter implements ZipIndexDiffHandler
 	private static final String DIFF_S_S = "  DIFF: %s%s\n";
 
 	private StringOut stringOut;
+	private boolean showDiff;
+	private boolean showUnchanged;
 
-	public ZipIndexDiffWriter(StringOut stringOut)
+	public ZipIndexDiffWriter(StringOut stringOut, boolean showDiff, boolean showUnchanged)
 	{
 		this.stringOut = stringOut;
+		this.showDiff = showDiff;
+		this.showUnchanged = showUnchanged;
 	}
 
 	@Override
@@ -42,7 +48,10 @@ public class ZipIndexDiffWriter implements ZipIndexDiffHandler
 	@Override
 	public void unchanged(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		write(ZipIndexDiffEntryType.UNCHANGED, zipIndexEntry.getFullyQualifiedPath());
+		if (this.showUnchanged)
+		{
+			write(ZipIndexDiffEntryType.UNCHANGED, zipIndexEntry.getFullyQualifiedPath());
+		}
 	}
 
 	@Override
@@ -52,9 +61,30 @@ public class ZipIndexDiffWriter implements ZipIndexDiffHandler
 	}
 
 	@Override
-	public void modified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	public void modified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, ContentDiff contentDiff)
 	{
 		write(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry.getFullyQualifiedPath(), otherZipIndexEntry.getFullyQualifiedPath());
+		if (showDiff)
+		{
+			for (ContentDiffEntry entry : contentDiff.getEntries())
+			{
+				switch (entry.getType())
+				{
+					case CONTENT_UNCHANGED:
+						contentUnchanged(zipIndexEntry, entry.getOldLines(), otherZipIndexEntry);
+						break;
+					case CONTENT_ADDED:
+						contentAdded(zipIndexEntry, otherZipIndexEntry, entry.getNewLines());
+						break;
+					case CONTENT_DELETED:
+						contentDeleted(zipIndexEntry, entry.getOldLines(), otherZipIndexEntry);
+						break;
+					case CONTENT_MODIFIED:
+						contentModified(zipIndexEntry, entry.getOldLines(), otherZipIndexEntry, entry.getNewLines());
+						break;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -96,19 +126,7 @@ public class ZipIndexDiffWriter implements ZipIndexDiffHandler
 		}
 	}
 
-
-	@Override
-	public void startContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
-	{
-		write(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry.getFullyQualifiedPath());
-	}
-
-	@Override
-	public void endContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
-	{
-	}
-
-	public void contentAdded(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, List<String> targetLines)
+	protected void contentAdded(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, List<String> targetLines)
 	{
 		try
 		{
@@ -124,7 +142,7 @@ public class ZipIndexDiffWriter implements ZipIndexDiffHandler
 
 	}
 
-	public void contentDeleted(ZipIndexEntry zipIndexEntry, List<String> sourceLines, ZipIndexEntry otherZipIndexEntry)
+	protected void contentDeleted(ZipIndexEntry zipIndexEntry, List<String> sourceLines, ZipIndexEntry otherZipIndexEntry)
 	{
 		try
 		{
@@ -140,8 +158,7 @@ public class ZipIndexDiffWriter implements ZipIndexDiffHandler
 
 	}
 
-
-	public void contentUnchanged(ZipIndexEntry zipIndexEntry, List<String> sourceLines, ZipIndexEntry otherZipIndexEntry)
+	protected void contentUnchanged(ZipIndexEntry zipIndexEntry, List<String> sourceLines, ZipIndexEntry otherZipIndexEntry)
 	{
 		try
 		{
@@ -156,7 +173,7 @@ public class ZipIndexDiffWriter implements ZipIndexDiffHandler
 		}
 	}
 
-	public void contentModified(ZipIndexEntry zipIndexEntry, List<String> sourceLines, ZipIndexEntry otherZipIndexEntry, List<String> targetLines)
+	protected void contentModified(ZipIndexEntry zipIndexEntry, List<String> sourceLines, ZipIndexEntry otherZipIndexEntry, List<String> targetLines)
 	{
 		try
 		{

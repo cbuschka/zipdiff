@@ -1,5 +1,6 @@
 package com.github.cbuschka.zipdiff.filter;
 
+import com.github.cbuschka.zipdiff.content_diff.ContentDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffHandler;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
@@ -46,45 +47,9 @@ public abstract class AbstractZipIndexDiffFilter implements ZipIndexDiffHandler
 	}
 
 	@Override
-	public void modified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	public void modified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, ContentDiff contentDiff)
 	{
-		handler.modified(zipIndexEntry, otherZipIndexEntry);
-	}
-
-	@Override
-	public void startContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
-	{
-		handler.startContentModified(zipIndexEntry, otherZipIndexEntry);
-	}
-
-	@Override
-	public void contentModified(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
-	{
-		handler.contentModified(zipIndexEntry, oldLines, otherZipIndexEntry, newLines);
-	}
-
-	@Override
-	public void contentDeleted(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry)
-	{
-		handler.contentDeleted(zipIndexEntry, oldLines, otherZipIndexEntry);
-	}
-
-	@Override
-	public void contentAdded(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, List<String> newLines)
-	{
-		handler.contentAdded(zipIndexEntry, otherZipIndexEntry, newLines);
-	}
-
-	@Override
-	public void contentUnchanged(ZipIndexEntry zipIndexEntry, List<String> oldLines, ZipIndexEntry otherZipIndexEntry)
-	{
-		handler.contentUnchanged(zipIndexEntry, oldLines, otherZipIndexEntry);
-	}
-
-	@Override
-	public void endContentModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
-	{
-		handler.endContentModified(zipIndexEntry, otherZipIndexEntry);
+		handler.modified(zipIndexEntry, otherZipIndexEntry, contentDiff);
 	}
 
 	@Override

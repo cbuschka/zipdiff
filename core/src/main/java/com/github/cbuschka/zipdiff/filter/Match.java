@@ -1,17 +1,17 @@
 package com.github.cbuschka.zipdiff.filter;
 
-import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
+import java.util.List;
 import java.util.Set;
 
-public class ZipIndexDiffEntryMatch
+public class Match
 {
 	private ZipIndexEntryMatch old = new ZipIndexEntryMatch();
 
 	private ZipIndexEntryMatch new_ = new ZipIndexEntryMatch();
 
-	private Set<ZipIndexDiffEntryType> types;
+	private Set<DiffType> types;
 
 	public void setOld(ZipIndexEntryMatch old)
 	{
@@ -33,19 +33,20 @@ public class ZipIndexDiffEntryMatch
 		return old;
 	}
 
-	public boolean matches(ZipIndexDiffEntryType zipIndexDiffEntryType, ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	public boolean matches(DiffType diffType, ZipIndexEntry zipIndexEntry, List<String> oldLines,
+						   ZipIndexEntry otherZipIndexEntry, List<String> newLines)
 	{
-		if (this.types != null && !this.types.isEmpty() && !this.types.contains(zipIndexDiffEntryType))
+		if (this.types != null && !this.types.isEmpty() && !this.types.contains(diffType))
 		{
 			return false;
 		}
 
-		if (this.old != null && zipIndexEntry != null && !this.old.matches(zipIndexEntry))
+		if (this.old != null && zipIndexEntry != null && !this.old.matches(zipIndexEntry, oldLines))
 		{
 			return false;
 		}
 
-		if (this.new_ != null && otherZipIndexEntry != null && !this.new_.matches(otherZipIndexEntry))
+		if (this.new_ != null && otherZipIndexEntry != null && !this.new_.matches(otherZipIndexEntry, newLines))
 		{
 			return false;
 		}
@@ -53,12 +54,12 @@ public class ZipIndexDiffEntryMatch
 		return true;
 	}
 
-	public void setTypes(Set<ZipIndexDiffEntryType> types)
+	public void setTypes(Set<DiffType> types)
 	{
 		this.types = types;
 	}
 
-	public Set<ZipIndexDiffEntryType> getTypes()
+	public Set<DiffType> getTypes()
 	{
 		return types;
 	}
