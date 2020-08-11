@@ -1,5 +1,7 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.diff;
 
+import com.github.cbuschka.zipdiff.TestZipFile;
+import com.github.cbuschka.zipdiff.TestZipFileBuilder;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffer;
@@ -13,23 +15,19 @@ import java.io.IOException;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class DetectRenamedEntryWithDupsTest
+public class DetectCrossNestedTipRenamingTest
 {
 	@Rule
-	public TestZipFile zipA = TestZipFile.from(TestZipFileBuilder
-			.newZipFile()
-			.withEntry("a.txt", "hello world!")
-			.withEntry("a2.txt", "hello world!"));
+	public TestZipFile zipA = TestZipFile.from(TestZipFileBuilder.newZipFile()
+			.withEntry("b.txt", "hello world!"));
 	@Rule
-	public TestZipFile zipB = TestZipFile.from(TestZipFileBuilder
-			.newZipFile()
-			.withEntry("b.txt", "hello world!")
-			.withEntry("b2.txt", "hello world!"));
+	public TestZipFile zipB = TestZipFile.from(TestZipFileBuilder.newZipFile()
+			.withEntry("a.zip", TestZipFileBuilder.newZipFile().withEntry("b2.txt", "hello world!")));
 
 	private ZipIndexDiffer differ = new ZipIndexDiffer(true);
 
 	@Test
-	public void detectsRenameWithDups() throws IOException
+	public void doesNotDetectCrossZipRenamings() throws IOException
 	{
 		ZipIndex indexA = ZipIndexReader.open(zipA.getFile()).read();
 		ZipIndex indexB = ZipIndexReader.open(zipB.getFile()).read();
@@ -37,8 +35,8 @@ public class DetectRenamedEntryWithDupsTest
 		ZipIndexDiff diff = differ.diff(indexA, indexB);
 
 		assertThat(diff.getEntries().size(), is(2));
-		assertThat(diff.getEntries().get(0).getType(), is(ZipIndexDiffEntryType.RENAMED));
-		assertThat(diff.getEntries().get(1).getType(), is(ZipIndexDiffEntryType.RENAMED));
+		assertThat(diff.getEntries().get(0).getType(), is(ZipIndexDiffEntryType.ADDED));
+		assertThat(diff.getEntries().get(1).getType(), is(ZipIndexDiffEntryType.DELETED));
 
 	}
 }

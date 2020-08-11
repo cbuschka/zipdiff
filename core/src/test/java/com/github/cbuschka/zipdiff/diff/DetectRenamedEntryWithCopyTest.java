@@ -1,5 +1,7 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.diff;
 
+import com.github.cbuschka.zipdiff.TestZipFile;
+import com.github.cbuschka.zipdiff.TestZipFileBuilder;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffer;
@@ -13,11 +15,11 @@ import java.io.IOException;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class DetectRenamedEntryWithCopyReverseTest
+public class DetectRenamedEntryWithCopyTest
 {
 	@Rule
 	public TestZipFile zipA = TestZipFile.from(TestZipFileBuilder.newZipFile()
-			.withEntry("b.txt", "hello world!"));
+			.withEntry("a.txt", "hello world!"));
 	@Rule
 	public TestZipFile zipB = TestZipFile.from(TestZipFileBuilder.newZipFile()
 			.withEntry("a.txt", "hello world!")
@@ -34,7 +36,7 @@ public class DetectRenamedEntryWithCopyReverseTest
 		ZipIndexDiff diff = differ.diff(indexA, indexB);
 
 		assertThat(diff.getEntries().size(), is(2));
-		assertThat(diff.getEntries().get(0).getType(), is(ZipIndexDiffEntryType.RENAMED));
+		assertThat(diff.getEntries().get(0).getType(), is(ZipIndexDiffEntryType.UNCHANGED));
 		assertThat(diff.getEntries().get(1).getType(), is(ZipIndexDiffEntryType.ADDED));
 
 	}

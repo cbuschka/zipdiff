@@ -2,6 +2,7 @@ package com.github.cbuschka.zipdiff.filter;
 
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,7 +12,7 @@ public class Match
 
 	private ZipIndexEntryMatch new_ = new ZipIndexEntryMatch();
 
-	private Set<DiffType> types;
+	private Set<DiffType> types = new HashSet<>();
 
 	public void setOld(ZipIndexEntryMatch old)
 	{

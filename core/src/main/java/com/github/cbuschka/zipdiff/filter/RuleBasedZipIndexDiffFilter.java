@@ -78,7 +78,6 @@ public class RuleBasedZipIndexDiffFilter extends AbstractZipIndexDiffFilter
 	{
 		if (shouldBeProcessed(ZipIndexDiffEntryType.MODIFIED, zipIndexEntry, otherZipIndexEntry))
 		{
-			super.modified(zipIndexEntry, otherZipIndexEntry, contentDiff);
 			contentDiff = filterContent(zipIndexEntry, otherZipIndexEntry, contentDiff);
 			if (contentDiff.hasChanges())
 			{

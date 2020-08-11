@@ -1,5 +1,7 @@
-package com.github.cbuschka.zipdiff;
+package com.github.cbuschka.zipdiff.diff;
 
+import com.github.cbuschka.zipdiff.TestZipFile;
+import com.github.cbuschka.zipdiff.TestZipFileBuilder;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffer;
