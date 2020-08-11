@@ -1,10 +1,61 @@
 package com.github.cbuschka.zipdiff.content_diff;
 
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public interface ContentDiffer
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ServiceLoader;
+
+public class ContentDiffer
 {
-	boolean handles(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry);
+	private static Logger logger = LoggerFactory.getLogger(ContentDiffer.class);
 
-	ContentDiff diff(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry);
+	private static List<ContentHandler> differs = loadContentDiffers();
+
+	private static ContentHandler defaultDiffer = new DefaultContentHandler();
+
+	private static List<ContentHandler> loadContentDiffers()
+	{
+		List<ContentHandler> differs = new ArrayList<>();
+
+		ServiceLoader<ContentHandler> loader = ServiceLoader.load(ContentHandler.class);
+		for (ContentHandler curr : loader)
+		{
+			differs.add(curr);
+		}
+
+		differs.addAll(Arrays.asList(
+				new ManifestContentHandler(),
+				new PropertiesContentHandler(),
+				new TextContentHandler()
+		));
+
+		logger.debug("Current content differs: {}", differs);
+
+		return differs;
+	}
+
+	public static ContentDiff diff(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry) {
+		return getContentDifferFor(zipIndexEntry, otherZipIndexEntry).diff(zipIndexEntry, otherZipIndexEntry);
+	}
+
+	private static ContentHandler getContentDifferFor(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	{
+		for (ContentHandler differ : differs)
+		{
+			if (differ.handles(zipIndexEntry, otherZipIndexEntry))
+			{
+				return differ;
+			}
+		}
+
+		return defaultDiffer;
+	}
+
+	private ContentDiffer()
+	{
+	}
 }

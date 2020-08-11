@@ -2,27 +2,28 @@ package com.github.cbuschka.zipdiff.content_diff;
 
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.StringReader;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class ManifestContentDifferTest
+public class PropertiesContentHandlerTest
 {
-	ManifestContentDiffer differ = new ManifestContentDiffer();
 
 	@Test
-	public void testIt() throws IOException
+	public void testIt()
 	{
-		Map<String, String> propsA = differ.parser.read(new StringReader("equalkey: equalvalues\n" //
-				+ "removedkey: removedvalue\n" //
-				+ "changedkey: value"));
-		Map<String, String> propsB = differ.parser.read(new StringReader("equalkey: equalvalues\n" //
-				+ "addedkey: addedvalue\n" //
-				+ "changedkey: changedvalue"));
+		Map<String, String> propsA = new LinkedHashMap<>();
+		propsA.put("equalkey", "equalvalue");
+		propsA.put("removedkey", "removedvalue");
+		propsA.put("changedkey", "value");
+		Map<String, String> propsB = new LinkedHashMap<>();
+		propsB.put("equalkey", "equalvalue");
+		propsB.put("addedkey", "addedvalue");
+		propsB.put("changedkey", "changedvalue");
 
+		PropertiesContentHandler differ = new PropertiesContentHandler();
 		ContentDiff diff = differ.diff(null, propsA, null, propsB);
 		List<ContentDiffEntry> entries = diff.getEntries();
 		assertEquals(4, entries.size());

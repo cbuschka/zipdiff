@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextContentDiffer implements ContentDiffer
+public class TextContentHandler implements ContentHandler
 {
 	private static final String[] SUFFIXES = {".txt", ".properties", ".xml", ".xsd", ".yml", ".yaml",
 			".json", "*.java"};

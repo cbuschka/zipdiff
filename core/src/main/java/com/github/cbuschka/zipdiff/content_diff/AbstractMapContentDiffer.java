@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractMapContentDiffer implements ContentDiffer
+public abstract class AbstractMapContentDiffer implements ContentHandler
 {
 	protected ContentDiff diff(ZipIndexEntry zipIndexEntry, Map<String, String> map, ZipIndexEntry otherZipIndexEntry, Map<String, String> otherMap)
 	{

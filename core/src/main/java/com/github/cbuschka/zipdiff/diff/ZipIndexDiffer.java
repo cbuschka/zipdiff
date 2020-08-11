@@ -2,7 +2,6 @@ package com.github.cbuschka.zipdiff.diff;
 
 import com.github.cbuschka.zipdiff.content_diff.ContentDiff;
 import com.github.cbuschka.zipdiff.content_diff.ContentDiffer;
-import com.github.cbuschka.zipdiff.content_diff.ContentDifferProvider;
 import com.github.cbuschka.zipdiff.index.ZipIndex;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
@@ -183,8 +182,7 @@ public class ZipIndexDiffer
 	private void onBFileModifiedByChecksum(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipIndexDiff
 			zipIndexDiff, Set<ZipIndexEntry> alreadyProcessedSet)
 	{
-		ContentDiffer contentDiffer = ContentDifferProvider.getContentDifferFor(aEntry, bEntry);
-		ContentDiff contentDiff = contentDiffer.diff(aEntry, bEntry);
+		ContentDiff contentDiff = ContentDiffer.diff(aEntry, bEntry);
 		if (contentDiff.hasChanges())
 		{
 			zipIndexDiff.addEntry(new ZipIndexDiffEntry(ZipIndexDiffEntryType.MODIFIED, aEntry, bEntry));

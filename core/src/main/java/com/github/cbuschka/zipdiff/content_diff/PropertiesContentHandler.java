@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class PropertiesContentDiffer extends AbstractMapContentDiffer
+public class PropertiesContentHandler extends AbstractMapContentDiffer
 {
 	private static final String[] SUFFIXES = {".properties"};
 

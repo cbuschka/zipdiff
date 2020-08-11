@@ -2,7 +2,6 @@ package com.github.cbuschka.zipdiff.process;
 
 import com.github.cbuschka.zipdiff.content_diff.ContentDiff;
 import com.github.cbuschka.zipdiff.content_diff.ContentDiffer;
-import com.github.cbuschka.zipdiff.content_diff.ContentDifferProvider;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntry;
 import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
@@ -52,8 +51,7 @@ public class ZipIndexDiffProcessor
 
 	private void handleModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		ContentDiffer contentDiffer = ContentDifferProvider.getContentDifferFor(zipIndexEntry, otherZipIndexEntry);
-		ContentDiff contentDiff = contentDiffer.diff(zipIndexEntry, otherZipIndexEntry);
+		ContentDiff contentDiff = ContentDiffer.diff(zipIndexEntry, otherZipIndexEntry);
 		if (contentDiff.hasChanges())
 		{
 			this.handler.modified(zipIndexEntry, otherZipIndexEntry, contentDiff);

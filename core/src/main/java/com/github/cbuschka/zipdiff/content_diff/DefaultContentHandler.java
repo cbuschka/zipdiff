@@ -5,7 +5,7 @@ import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 import java.util.Arrays;
 import java.util.List;
 
-public class DefaultContentDiffer implements ContentDiffer
+public class DefaultContentHandler implements ContentHandler
 {
 	@Override
 	public boolean handles(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
