@@ -1,6 +1,6 @@
-# ZipDiff [![Build](https://api.travis-ci.com/cbuschka/zipdiff.svg?branch=master)](https://travis-ci.com/github/cbuschka/zipdiff) [![License](https://img.shields.io/github/license/cbuschka/zipdiff.svg)](https://github.com/cbuschka/zipdiff/blob/master/license.txt)
+# ZipDiff [![Build](https://api.travis-ci.com/cbuschka/zipdiff.svg?branch=master)](https://travis-ci.com/github/cbuschka/zipdiff) [![Maven Central](https://img.shields.io/maven-central/v/com.github.cbuschka.zipdiff/zipdiff-maven-plugin.svg)](https://search.maven.org/search?q=g:com.github.cbuschka.zipdiff%20AND%20a:zipdiff-maven-plugin) [![License](https://img.shields.io/github/license/cbuschka/zipdiff.svg)](https://github.com/cbuschka/zipdiff/blob/master/license.txt)
 
-### A command line tool to diff jar/zip files
+### A lib, cli tool and maven plugin to diff jar/zip/ear/war/... files
 
 ## Build
 ```
