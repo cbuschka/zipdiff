@@ -16,6 +16,7 @@
         <developerConnection>scm:git:ssh://git@github.com/cbuschka/zipdiff</developerConnection>
         <connection>scm:git:ssh://git@github.com/cbuschka/zipdiff</connection>
         <tag>HEAD</tag>
+        <url>https://github.com/cbuschka/zipdiff.git</url>
     </scm>
     <url>https://github.com/cbuschka/zipdiff</url>
     <developers>
