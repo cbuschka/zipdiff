@@ -2,6 +2,12 @@
 
 ### A lib, cli tool and maven plugin to diff jar/zip/ear/war/... files
 
+## Features
+* Detects entry modification, renaming, deletion and addition
+* Recursive diff (nested zips)
+* Filtering rules on paths and content
+* Content diff for: java MANIFEST.MF, properties files, text files
+
 ## Usage
 
 ### Maven Plugin
