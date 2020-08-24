@@ -21,6 +21,7 @@
                     <new>${NEW_FILE}</new>
                     <recurse>true</recurse>
                     <quiet>false</quiet>
+                    <encoding>UTF-8</encoding>
                     <rules>
                         <rule>
                             <id>rule0</id>

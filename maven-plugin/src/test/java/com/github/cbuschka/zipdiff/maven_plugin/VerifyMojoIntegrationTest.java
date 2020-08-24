@@ -39,7 +39,7 @@ public class VerifyMojoIntegrationTest
 		verifier.deleteArtifact("com.github.cbuschka.zipdiff", "zipdiff-maven-plugin-it-pom", "1.0.0-SNAPSHOT", "pom");
 		verifier.resetStreams();
 
-		env.put("PLUGIN_VERSION", "2.0.0-SNAPSHOT");
+		env.put("PLUGIN_VERSION", "2.1.0-SNAPSHOT");
 	}
 
 	@Test

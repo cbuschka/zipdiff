@@ -17,6 +17,7 @@
                     <goal>verify</goal>
                 </goals>
                 <configuration>
+                    <encoding>UTF-8</encoding>
                     <old>${OLD_FILE}</old>
                     <new>${NEW_FILE}</new>
                     <recurse>true</recurse>
