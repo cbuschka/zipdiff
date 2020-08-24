@@ -32,7 +32,7 @@
 
 ## Build
 ### Required prerequisites:
-* maven
+* maven >= 3.5
 * java >= 8
 
 ```
