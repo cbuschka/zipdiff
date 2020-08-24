@@ -11,6 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -28,7 +29,7 @@ public class DetectRenamedEntryWithDupsTest
 			.withEntry("b.txt", "hello world!")
 			.withEntry("b2.txt", "hello world!"));
 
-	private ZipIndexDiffer differ = new ZipIndexDiffer(true);
+	private ZipIndexDiffer differ = new ZipIndexDiffer(StandardCharsets.UTF_8, true);
 
 	@Test
 	public void detectsRenameWithDups() throws IOException

@@ -4,6 +4,7 @@ import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,8 +39,8 @@ public class ContentDiffer
 		return differs;
 	}
 
-	public static ContentDiff diff(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry) {
-		return getContentDifferFor(zipIndexEntry, otherZipIndexEntry).diff(zipIndexEntry, otherZipIndexEntry);
+	public static ContentDiff diff(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, Charset encoding) {
+		return getContentDifferFor(zipIndexEntry, otherZipIndexEntry).diff(zipIndexEntry, otherZipIndexEntry, encoding);
 	}
 
 	private static ContentHandler getContentDifferFor(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)

@@ -13,6 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -67,7 +68,7 @@ public class PathMatchFilteringTest
 
 	private void whenDiffed() throws IOException
 	{
-		ZipIndexDiffer differ = new ZipIndexDiffer(true);
+		ZipIndexDiffer differ = new ZipIndexDiffer(StandardCharsets.UTF_8, true);
 		ZipIndex oneZipIndex = ZipIndexReader.open(oneZipFile.getFile()).read();
 		ZipIndex otherZipIndex = ZipIndexReader.open(otherZipFile.getFile()).read();
 		ZipIndexDiff indexDiff = differ.diff(oneZipIndex, otherZipIndex);
@@ -77,6 +78,6 @@ public class PathMatchFilteringTest
 	private void givenIsAProcessingPipeline()
 	{
 		RuleBasedZipIndexDiffFilter filter = new RuleBasedZipIndexDiffFilter(config, recorder);
-		processor = new ZipIndexDiffProcessor(filter);
+		processor = new ZipIndexDiffProcessor(filter, StandardCharsets.UTF_8);
 	}
 }

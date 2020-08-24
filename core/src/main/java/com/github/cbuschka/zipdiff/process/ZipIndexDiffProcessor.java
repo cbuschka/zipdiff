@@ -9,14 +9,23 @@ import com.github.cbuschka.zipdiff.diff.ZipIndexDiffHandler;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 public class ZipIndexDiffProcessor
 {
+	private Charset encoding;
+
 	private ZipIndexDiffHandler handler;
 
-	public ZipIndexDiffProcessor(ZipIndexDiffHandler handler)
+	public ZipIndexDiffProcessor(ZipIndexDiffHandler handler, Charset encoding)
 	{
 		this.handler = handler;
+		this.encoding = encoding;
+	}
+
+	public void setEncoding(Charset encoding)
+	{
+		this.encoding = encoding;
 	}
 
 	public void process(ZipIndexDiff diff) throws IOException
@@ -51,7 +60,7 @@ public class ZipIndexDiffProcessor
 
 	private void handleModified(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
 	{
-		ContentDiff contentDiff = ContentDiffer.diff(zipIndexEntry, otherZipIndexEntry);
+		ContentDiff contentDiff = ContentDiffer.diff(zipIndexEntry, otherZipIndexEntry, encoding);
 		if (contentDiff.hasChanges())
 		{
 			this.handler.modified(zipIndexEntry, otherZipIndexEntry, contentDiff);

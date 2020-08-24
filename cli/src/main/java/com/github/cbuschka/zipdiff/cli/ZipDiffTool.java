@@ -13,13 +13,14 @@ import org.apache.commons.cli.ParseException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.function.Function;
 
 public class ZipDiffTool
 {
 	private ZipDiffToolArgsParser argsParser = new ZipDiffToolArgsParser();
 	private Function<File, ZipIndexReader> zipIndexReaderOpener = ZipIndexReader::open;
-	private ZipIndexDiffer zipIndexDiffer = new ZipIndexDiffer(true);
+	private ZipIndexDiffer zipIndexDiffer = new ZipIndexDiffer(Charset.defaultCharset(), true);
 
 	public int run(String... args) throws IOException, ParseException
 	{
@@ -65,7 +66,7 @@ public class ZipDiffTool
 
 	private void writeDiff(ZipDiffToolArgs args, ZipIndexDiff diff) throws IOException
 	{
-		ZipIndexDiffProcessor diffProcessor = new ZipIndexDiffProcessor(new ZipIndexDiffWriter(args.isQuiet() ? new NullStringOut() : new WriterStringOut(System.out), args.isShowDiffs(), args.isShowUnchanged()));
+		ZipIndexDiffProcessor diffProcessor = new ZipIndexDiffProcessor(new ZipIndexDiffWriter(args.isQuiet() ? new NullStringOut() : new WriterStringOut(System.out), args.isShowDiffs(), args.isShowUnchanged()), this.zipIndexDiffer.getEncoding());
 		diffProcessor.process(diff);
 	}
 

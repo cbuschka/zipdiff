@@ -2,6 +2,7 @@ package com.github.cbuschka.zipdiff.content_diff;
 
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class DefaultContentHandler implements ContentHandler
 	}
 
 	@Override
-	public ContentDiff diff(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	public ContentDiff diff(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, Charset encoding)
 	{
 		List<ContentDiffEntry> entries = Arrays.asList(new ContentDiffEntry(ContentDiffType.CONTENT_MODIFIED, Arrays.asList("Binary data"), Arrays.asList("Binary data")));
 		return new ContentDiff(zipIndexEntry, otherZipIndexEntry, entries);

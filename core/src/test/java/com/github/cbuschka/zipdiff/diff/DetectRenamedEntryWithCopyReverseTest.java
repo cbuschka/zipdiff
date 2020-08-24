@@ -2,15 +2,13 @@ package com.github.cbuschka.zipdiff.diff;
 
 import com.github.cbuschka.zipdiff.TestZipFile;
 import com.github.cbuschka.zipdiff.TestZipFileBuilder;
-import com.github.cbuschka.zipdiff.diff.ZipIndexDiff;
-import com.github.cbuschka.zipdiff.diff.ZipIndexDiffEntryType;
-import com.github.cbuschka.zipdiff.diff.ZipIndexDiffer;
 import com.github.cbuschka.zipdiff.index.ZipIndex;
 import com.github.cbuschka.zipdiff.index.ZipIndexReader;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -25,7 +23,7 @@ public class DetectRenamedEntryWithCopyReverseTest
 			.withEntry("a.txt", "hello world!")
 			.withEntry("b.txt", "hello world!"));
 
-	private ZipIndexDiffer differ = new ZipIndexDiffer(true);
+	private ZipIndexDiffer differ = new ZipIndexDiffer(StandardCharsets.UTF_8, true);
 
 	@Test
 	public void testIt() throws IOException

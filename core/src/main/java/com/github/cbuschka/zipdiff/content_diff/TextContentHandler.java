@@ -12,7 +12,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,13 +62,13 @@ public class TextContentHandler implements ContentHandler
 	}
 
 	@Override
-	public ContentDiff diff(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	public ContentDiff diff(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, Charset encoding)
 	{
 		try
 		{
 			List<ContentDiffEntry> entries = new ArrayList<>();
-			String aText = IOUtils.toString(zipIndexEntry.getDataStream(), StandardCharsets.UTF_8);
-			String bText = IOUtils.toString(otherZipIndexEntry.getDataStream(), StandardCharsets.UTF_8);
+			String aText = IOUtils.toString(zipIndexEntry.getDataStream(), encoding);
+			String bText = IOUtils.toString(otherZipIndexEntry.getDataStream(), encoding);
 			Patch<String> patch = DiffUtils.diff(aText, bText, (DiffAlgorithmListener) null);
 			for (AbstractDelta<String> delta : patch.getDeltas())
 			{

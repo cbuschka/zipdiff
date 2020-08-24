@@ -25,7 +25,7 @@ public class ZipIndexDifferTest
 	private ZipIndex zipIndexA;
 	private ZipIndex zipIndexB;
 
-	private ZipIndexDiffer differ = new ZipIndexDiffer(true);
+	private ZipIndexDiffer differ = new ZipIndexDiffer(StandardCharsets.UTF_8, true);
 	private ZipIndexDiff zipIndexDiff;
 
 	@Test

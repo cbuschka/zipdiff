@@ -6,6 +6,7 @@ import com.github.cbuschka.zipdiff.index.ZipIndex;
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
 
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,9 +15,22 @@ public class ZipIndexDiffer
 {
 	private boolean recurse;
 
-	public ZipIndexDiffer(boolean recurse)
+	private Charset encoding;
+
+	public ZipIndexDiffer(Charset encoding, boolean recurse)
 	{
+		this.encoding = encoding;
 		this.recurse = recurse;
+	}
+
+	public Charset getEncoding()
+	{
+		return encoding;
+	}
+
+	public void setEncoding(Charset encoding)
+	{
+		this.encoding = encoding;
 	}
 
 	public void setRecurse(boolean recurse)
@@ -182,7 +196,7 @@ public class ZipIndexDiffer
 	private void onBFileModifiedByChecksum(ZipIndexEntry bEntry, ZipIndexEntry aEntry, ZipIndexDiff
 			zipIndexDiff, Set<ZipIndexEntry> alreadyProcessedSet)
 	{
-		ContentDiff contentDiff = ContentDiffer.diff(aEntry, bEntry);
+		ContentDiff contentDiff = ContentDiffer.diff(aEntry, bEntry, encoding);
 		if (contentDiff.hasChanges())
 		{
 			zipIndexDiff.addEntry(new ZipIndexDiffEntry(ZipIndexDiffEntryType.MODIFIED, aEntry, bEntry));

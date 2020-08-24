@@ -1,11 +1,11 @@
 package com.github.cbuschka.zipdiff.content_diff;
 
 import com.github.cbuschka.zipdiff.index.ZipIndexEntry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -34,12 +34,12 @@ public class PropertiesContentHandler extends AbstractMapContentDiffer
 	}
 
 	@Override
-	public ContentDiff diff(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry)
+	public ContentDiff diff(ZipIndexEntry zipIndexEntry, ZipIndexEntry otherZipIndexEntry, Charset encoding)
 	{
 		try
 		{
-			Map<String, String> properties = load(zipIndexEntry.getDataStream());
-			Map<String, String> otherProperties = load(zipIndexEntry.getDataStream());
+			Map<String, String> properties = load(zipIndexEntry.getDataStream(), encoding.name());
+			Map<String, String> otherProperties = load(zipIndexEntry.getDataStream(), encoding.name());
 
 			return diff(zipIndexEntry, properties, otherZipIndexEntry, otherProperties);
 		}
@@ -49,10 +49,10 @@ public class PropertiesContentHandler extends AbstractMapContentDiffer
 		}
 	}
 
-	private Map<String, String> load(InputStream in) throws IOException
+	private Map<String, String> load(InputStream in, String encoding) throws IOException
 	{
 		Properties props = new Properties();
-		props.load(in);
+		props.load(new InputStreamReader(in, Charset.forName(encoding)));
 		Map<String, String> map = new LinkedHashMap<>();
 		for (Map.Entry<Object, Object> entry : props.entrySet())
 		{

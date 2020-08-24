@@ -24,6 +24,7 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluatio
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,8 @@ public class VerifyMojo extends AbstractMojo
 	private List<Rule> rules = new ArrayList<>();
 	@Parameter(defaultValue = "${session}", required = true, readonly = true)
 	private MavenSession session;
+	@Parameter(defaultValue = "${encoding}")
+	private String encoding = Charset.defaultCharset().name();
 
 	public void execute() throws MojoExecutionException
 	{
@@ -61,13 +64,15 @@ public class VerifyMojo extends AbstractMojo
 		PluginParameterExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(session);
 		try
 		{
+			Charset encoding = this.encoding != null ? Charset.forName(this.encoding) : Charset.defaultCharset();
+
 			Log log = getLog();
 			log.info("Verifying...");
 			log.info(String.format("Old: %s", expressionEvaluator.evaluate(old.getAbsolutePath(), String.class)));
 			log.info(String.format("New: %s", expressionEvaluator.evaluate(new_.getAbsolutePath(), String.class)));
 
-			ZipIndexDiff zipIndexDiff = diff();
-			int diffCount = process(zipIndexDiff);
+			ZipIndexDiff zipIndexDiff = diff(encoding);
+			int diffCount = process(zipIndexDiff, encoding);
 			if (diffCount > 0)
 			{
 				if (failIfDiffsPresent)
@@ -90,7 +95,7 @@ public class VerifyMojo extends AbstractMojo
 		}
 	}
 
-	private int process(ZipIndexDiff zipIndexDiff) throws IOException
+	private int process(ZipIndexDiff zipIndexDiff, Charset encoding) throws IOException
 	{
 		ZipIndexDiffWriter writer = new ZipIndexDiffWriter(this.quiet ? new NullStringOut() : new MavenStringOut(getLog()), this.diffContents, this.showUnchanged);
 		DiffRegisteringZipIndexDiffFilter diffRegisteringFilter = new DiffRegisteringZipIndexDiffFilter(writer);
@@ -98,17 +103,17 @@ public class VerifyMojo extends AbstractMojo
 		config.setRules(this.rules);
 		config.setDefaultAction(Action.PROCESS);
 		RuleBasedZipIndexDiffFilter rulesBasedFilter = new RuleBasedZipIndexDiffFilter(config, diffRegisteringFilter);
-		ZipIndexDiffProcessor diffProcessor = new ZipIndexDiffProcessor(rulesBasedFilter);
+		ZipIndexDiffProcessor diffProcessor = new ZipIndexDiffProcessor(rulesBasedFilter, encoding);
 		diffProcessor.process(zipIndexDiff);
 		return diffRegisteringFilter.getDiffCount();
 	}
 
-	private ZipIndexDiff diff() throws IOException
+	private ZipIndexDiff diff(Charset encoding) throws IOException
 	{
 		ZipIndex zipIndexA = readZipIndex(this.old);
 		ZipIndex zipIndexB = readZipIndex(this.new_);
 
-		ZipIndexDiffer zipIndexDiffer = new ZipIndexDiffer(this.recurse);
+		ZipIndexDiffer zipIndexDiffer = new ZipIndexDiffer(encoding, this.recurse);
 		ZipIndexDiff zipIndexDiff = zipIndexDiffer.diff(zipIndexA, zipIndexB);
 		return zipIndexDiff;
 	}
