@@ -9,8 +9,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +39,7 @@ public class VerifyMojoIntegrationTest
 	private Map<String, String> env = new HashMap<>();
 
 	@Before
-	public void setup() throws VerificationException, IOException
+	public void setup() throws VerificationException, IOException, ParserConfigurationException, SAXException
 	{
 		this.testDir = tempFolder.newFolder();
 		verifier = new Verifier(testDir.getAbsolutePath());
@@ -39,7 +47,31 @@ public class VerifyMojoIntegrationTest
 		verifier.deleteArtifact("com.github.cbuschka.zipdiff", "zipdiff-maven-plugin-it-pom", "1.0.0-SNAPSHOT", "pom");
 		verifier.resetStreams();
 
-		env.put("PLUGIN_VERSION", "2.1.0-SNAPSHOT");
+		env.put("PLUGIN_VERSION", getPluginVersion());
+	}
+
+	private String getPluginVersion() throws IOException, ParserConfigurationException, SAXException
+	{
+		File basedir = new File("");
+		File pomXmlFile = new File(basedir.getParentFile(), "pom.xml");
+		if (!pomXmlFile.exists())
+		{
+			throw new FileNotFoundException("No pom.xml found: " + pomXmlFile.getAbsolutePath());
+		}
+
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+		documentBuilderFactory.setNamespaceAware(true);
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+		Document doc = documentBuilder.parse(pomXmlFile);
+		Element documentElement = doc.getDocumentElement();
+		NodeList versionElements = documentElement.getElementsByTagName("version");
+		if (versionElements.getLength() == 0)
+		{
+			throw new IllegalStateException("No <version> tag in pom.xml found.");
+		}
+		Element versionElement = (Element) versionElements.item(0);
+		String version = versionElement.getTextContent().trim();
+		return version;
 	}
 
 	@Test
