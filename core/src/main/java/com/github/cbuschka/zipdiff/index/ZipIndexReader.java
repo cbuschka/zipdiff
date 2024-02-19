@@ -105,7 +105,10 @@ public class ZipIndexReader implements Closeable
 	private boolean isZip(String entryPath)
 	{
 		return entryPath.toLowerCase().endsWith(".zip")
-				|| entryPath.toLowerCase().endsWith(".jar");
+				|| entryPath.toLowerCase().endsWith(".ear")
+				|| entryPath.toLowerCase().endsWith(".rar")
+				|| entryPath.toLowerCase().endsWith(".jar")
+				|| entryPath.toLowerCase().endsWith(".war");
 	}
 
 	public void close() throws IOException
